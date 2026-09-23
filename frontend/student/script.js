@@ -21,7 +21,7 @@ const API_ENDPOINTS = {
     `${API_BASE_URL}/auth/profile`,
 
   dashboard:
-    `${API_BASE_URL}/student/dashboard`
+  `${API_BASE_URL}/api/student/dashboard`
 
 };
 
@@ -2393,21 +2393,47 @@ async function loadStudentDashboard() {
          * /api/quizzes, so do not send
          * undefined data into them.
          */
-        renderDashboardStats({
-        tests_completed: 0,
-        average_score: 0
-        });
+       const dashboardResponse = await fetch(
+    `${API_BASE_URL}/api/student/dashboard`,
+    {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    }
+);
 
-        renderDashboardProgress({
-        completed: 0,
-        total: tests.length,
-        percentage: 0,
-        average_score: 0
-        });
+if (!dashboardResponse.ok) {
+    const errorText = await dashboardResponse.text();
 
-        renderRecentResults(
-            []
-        );
+    console.error(
+        "Student dashboard API error:",
+        dashboardResponse.status,
+        errorText
+    );
+
+    return;
+}
+
+const dashboardData = await dashboardResponse.json();
+
+console.log(
+    "STUDENT DASHBOARD DATA:",
+    dashboardData
+);
+
+renderDashboardStats(
+    dashboardData.stats
+);
+
+renderDashboardProgress(
+    dashboardData.progress
+);
+
+renderRecentResults(
+    dashboardData.recent_results
+);
 
     } catch (error) {
 

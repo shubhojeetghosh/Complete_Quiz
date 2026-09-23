@@ -30,6 +30,8 @@ from app.admin_portal.routes.student_exam_access import (
 from app.admin_portal.routes.students import router as students_router
 
 from app.routes.student_exams import router as student_exams_router
+from app.routes.student_dashboard import router as student_dashboard_router
+
 
 
 # ─────────────────────────────────────────
@@ -86,11 +88,11 @@ def create_app() -> FastAPI:
     app.include_router(student_exam_access_router)
     app.include_router(admin_student_access_router)
 
-    # Student
+       # Student
     app.include_router(student_exams_router)
+    app.include_router(student_dashboard_router)
 
     return app
-
 
 # ─────────────────────────────────────────
 # APP INSTANCE

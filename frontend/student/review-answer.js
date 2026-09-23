@@ -1025,19 +1025,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ============================================================
 
     if (dashboardButton) {
-
-        dashboardButton.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "index.html";
-
-            }
-        );
-
-    }
-
+    dashboardButton.addEventListener(
+        "click",
+        function () {
+            window.location.href =
+                "dashboard.html";
+        }
+    );
+}
 
     // ============================================================
     // LOAD
