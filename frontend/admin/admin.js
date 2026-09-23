@@ -170,50 +170,288 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* =====================================================
        DASHBOARD STATISTICS
+       
+       IMPORTANT:
+       Total Users means ONLY registered students.
+       
+       Admin accounts are NOT included.
+       
+       Backend currently returns:
+       
+       total_students
+       total_admins
+       total_exams
+       total_questions
+       total_attempts
     ===================================================== */
 
     function updateDashboardStats(data) {
 
         data = data || {};
 
+        console.log(
+            "Updating dashboard statistics:",
+            data
+        );
+
+
+        /* =================================================
+           TOTAL STUDENTS
+           
+           Only students are counted as users.
+           total_admins is intentionally NOT included.
+        ================================================= */
+
+        const studentCount =
+            Number(
+                data.total_students ?? 0
+            );
+
+
+        /* =================================================
+           TOTAL USERS
+           
+           Dashboard Total Users = STUDENTS ONLY
+        ================================================= */
+
         if (totalUsers) {
+
             totalUsers.textContent =
-                data.totalUsers ?? 0;
+                studentCount;
+
         }
+
+
+        /* =================================================
+           USERS GROWTH
+           
+           Current backend does not provide a growth value,
+           so use 0%.
+        ================================================= */
 
         if (usersGrowth) {
+
             usersGrowth.textContent =
-                `↑ ${data.usersGrowth ?? 0}%`;
+                `↑ ${data.usersGrowth ?? data.users_growth ?? 0}%`;
+
         }
+
+
+        /* =================================================
+           TOTAL QUIZZES
+           
+           Backend field:
+           total_exams
+           
+           Frontend card:
+           Total Quizzes
+        ================================================= */
 
         if (totalQuizzes) {
+
             totalQuizzes.textContent =
-                data.totalQuizzes ?? 0;
+                Number(
+                    data.total_exams ??
+                    data.totalQuizzes ??
+                    0
+                );
+
         }
+
+
+        /* =================================================
+           QUIZZES GROWTH
+        ================================================= */
 
         if (quizzesGrowth) {
+
             quizzesGrowth.textContent =
-                `↑ ${data.quizzesGrowth ?? 0}%`;
+                `↑ ${
+                    data.quizzesGrowth ??
+                    data.quizzes_growth ??
+                    0
+                }%`;
+
         }
+
+
+        /* =================================================
+           TOTAL QUESTIONS
+        ================================================= */
 
         if (totalQuestions) {
+
             totalQuestions.textContent =
-                data.totalQuestions ?? 0;
+                Number(
+                    data.total_questions ??
+                    data.totalQuestions ??
+                    0
+                );
+
         }
+
+
+        /* =================================================
+           QUESTIONS GROWTH
+        ================================================= */
 
         if (questionsGrowth) {
+
             questionsGrowth.textContent =
-                `↑ ${data.questionsGrowth ?? 0}%`;
+                `↑ ${
+                    data.questionsGrowth ??
+                    data.questions_growth ??
+                    0
+                }%`;
+
         }
+
+
+        /* =================================================
+           TOTAL ATTEMPTS
+        ================================================= */
 
         if (totalAttempts) {
+
             totalAttempts.textContent =
-                data.totalAttempts ?? 0;
+                Number(
+                    data.total_attempts ??
+                    data.totalAttempts ??
+                    0
+                );
+
         }
 
+
+        /* =================================================
+           ATTEMPTS GROWTH
+        ================================================= */
+
         if (attemptsGrowth) {
+
             attemptsGrowth.textContent =
-                `↑ ${data.attemptsGrowth ?? 0}%`;
+                `↑ ${
+                    data.attemptsGrowth ??
+                    data.attempts_growth ??
+                    0
+                }%`;
+
+        }
+
+
+        /* =================================================
+           DEBUG
+        ================================================= */
+
+        console.log(
+            "Dashboard values updated:",
+            {
+                totalStudents: studentCount,
+
+                totalAdmins:
+                    Number(
+                        data.total_admins ?? 0
+                    ),
+
+                totalExams:
+                    Number(
+                        data.total_exams ??
+                        data.totalQuizzes ??
+                        0
+                    ),
+
+                totalQuestions:
+                    Number(
+                        data.total_questions ??
+                        data.totalQuestions ??
+                        0
+                    ),
+
+                totalAttempts:
+                    Number(
+                        data.total_attempts ??
+                        data.totalAttempts ??
+                        0
+                    )
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       LOAD DASHBOARD STATISTICS FROM BACKEND
+    ===================================================== */
+
+    async function loadDashboardStats() {
+
+        try {
+
+            const adminToken =
+                localStorage.getItem(
+                    "admin_access_token"
+                );
+
+
+            if (!adminToken) {
+
+                console.error(
+                    "Admin access token not found."
+                );
+
+                return;
+
+            }
+
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/admin/dashboard`,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${adminToken}`,
+
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Failed to load dashboard statistics: ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Dashboard statistics:",
+                data
+            );
+
+
+            updateDashboardStats(
+                data
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error loading dashboard statistics:",
+                error
+            );
+
         }
 
     }
@@ -227,25 +465,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
         data = data || {};
 
+
         if (averageScore) {
+
             averageScore.textContent =
                 `${data.averageScore ?? 0}%`;
+
         }
+
 
         if (passRate) {
+
             passRate.textContent =
                 `${data.passRate ?? 0}%`;
+
         }
 
+
         if (todayAttempts) {
+
             todayAttempts.textContent =
                 data.todayAttempts ?? 0;
+
         }
+
 
         const totalResultAttempts =
             document.getElementById(
                 "totalResultAttempts"
             );
+
 
         if (totalResultAttempts) {
 
@@ -257,15 +506,1625 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+/* =========================================================
+   ADMIN RESULTS
+   LOAD REAL RESULTS FROM BACKEND
+========================================================= */
+
+let currentAdminResults = [];
+
+
+/* =========================================================
+   RESULT TABLE ELEMENTS
+========================================================= */
+
+const resultsTableBody =
+    document.getElementById(
+        "resultsTableBody"
+    );
+
+const resultSearch =
+    document.getElementById(
+        "resultSearch"
+    );
+
+const resultQuizFilter =
+    document.getElementById(
+        "resultQuizFilter"
+    );
+
+const resultStatusFilter =
+    document.getElementById(
+        "resultStatusFilter"
+    );
+
+
+/* =========================================================
+   PASS MARK
+========================================================= */
+
+/*
+ * Your existing student result page uses
+ * 40% as the default passing percentage.
+ *
+ * Change this to another value later if
+ * your institute uses a different pass mark.
+ */
+
+const ADMIN_PASS_MARK = 40;
+
+
+/* =========================================================
+   LOAD ADMIN RESULTS
+========================================================= */
+
+async function loadAdminResults() {
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "LOADING ADMIN RESULTS"
+    );
+
+    console.log(
+        "================================="
+    );
+
+
+    const accessToken =
+        localStorage.getItem(
+            "admin_access_token"
+        );
+
+
+    if (!accessToken) {
+
+        console.error(
+            "No admin access token found."
+        );
+
+        return;
+    }
+
+
+    /*
+     * The existing Admin Results backend
+     * route is /admin/attempts.
+     */
+
+    const url =
+        `${API_BASE_URL}/admin/attempts`;
+
+
+    console.log(
+        "Admin Results URL:",
+        url
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${accessToken}`,
+
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        console.log(
+            "Admin Results Status:",
+            response.status
+        );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+
+            console.error(
+                "Admin Results API Error:",
+                errorText
+            );
+
+
+            throw new Error(
+                `Results API returned ${response.status}`
+            );
+        }
+
+        const data =
+    await response.json();
+
+console.log(
+    "ADMIN RESULTS DATA:",
+    data
+);
+
+console.log(
+    "ADMIN RESULTS IS ARRAY:",
+    Array.isArray(data)
+);
+
+console.log(
+    "ADMIN RESULTS COUNT:",
+    Array.isArray(data)
+        ? data.length
+        : "NOT AN ARRAY"
+);
+
+
+        /*
+         * Backend returns a list of attempts.
+         */
+
+        currentAdminResults =
+            Array.isArray(data)
+                ? data
+                : (
+                    Array.isArray(data.results)
+                        ? data.results
+                        : (
+                            Array.isArray(data.attempts)
+                                ? data.attempts
+                                : []
+                        )
+                );
+
+
+        console.log(
+            "Parsed Admin Results:",
+            currentAdminResults
+        );
+
+
+        /*
+         * Update statistics.
+         */
+
+        updateAdminResultStatistics(
+            currentAdminResults
+        );
+
+
+        /*
+         * Fill quiz filter.
+         */
+
+        populateResultQuizFilter(
+            currentAdminResults
+        );
+
+
+        /*
+         * Render table.
+         */
+
+        renderAdminResultsTable(
+            currentAdminResults
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load admin results:",
+            error
+        );
+
+
+        if (resultsTableBody) {
+
+            resultsTableBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="7"
+                        class="empty-table"
+                    >
+                        Unable to load results.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   GET RESULT OBJECT
+========================================================= */
+
+function getResultObject(
+    attempt
+) {
+
+    return (
+        attempt.result ||
+        attempt.results ||
+        null
+    );
+
+}
+
+
+/* =========================================================
+   GET PERCENTAGE
+========================================================= */
+
+function getResultPercentage(
+    attempt
+) {
+
+    const result =
+        getResultObject(
+            attempt
+        );
+
+
+    if (!result) {
+
+        return null;
+
+    }
+
+
+    const value =
+        result.percentage ??
+        result.score_percentage ??
+        result.percent;
+
+
+    if (
+        value === undefined ||
+        value === null
+    ) {
+
+        return null;
+
+    }
+
+
+    const percentage =
+        Number(value);
+
+
+    return Number.isFinite(
+        percentage
+    )
+        ? percentage
+        : null;
+
+}
+
+
+/* =========================================================
+   GET SCORE
+========================================================= */
+
+function getResultScore(
+    attempt
+) {
+
+    const result =
+        getResultObject(
+            attempt
+        );
+
+
+    if (!result) {
+
+        return null;
+
+    }
+
+
+    const value =
+        result.score ??
+        result.total_score;
+
+
+    if (
+        value === undefined ||
+        value === null
+    ) {
+
+        return null;
+
+    }
+
+
+    const score =
+        Number(value);
+
+
+    return Number.isFinite(
+        score
+    )
+        ? score
+        : null;
+
+}
+
+
+/* =========================================================
+   GET RESULT STATUS
+========================================================= */
+
+function getAdminResultStatus(
+    attempt
+) {
+
+    const percentage =
+        getResultPercentage(
+            attempt
+        );
+
+
+    /*
+     * No result yet.
+     */
+
+    if (
+        percentage === null
+    ) {
+
+        return "pending";
+
+    }
+
+
+    if (
+        percentage >=
+        ADMIN_PASS_MARK
+    ) {
+
+        return "passed";
+
+    }
+
+
+    return "failed";
+
+}
+
+
+/* =========================================================
+   GET STUDENT NAME
+========================================================= */
+
+function getAttemptStudentName(
+    attempt
+) {
+
+    const student =
+        attempt.student ||
+        {};
+
+
+    return (
+        student.name ||
+        student.full_name ||
+        student.fullName ||
+        student.email ||
+        `Student ${attempt.user_id ?? ""}`
+    );
+
+}
+
+
+/* =========================================================
+   GET QUIZ NAME
+========================================================= */
+
+function getAttemptQuizName(
+    attempt
+) {
+
+    const exam =
+        attempt.exam ||
+        {};
+
+
+    return (
+        exam.title ||
+        exam.name ||
+        `Exam ${attempt.exam_id ?? ""}`
+    );
+
+}
+
+
+/* =========================================================
+   GET DATE
+========================================================= */
+
+function getAttemptDate(
+    attempt
+) {
+
+    const date =
+        attempt.submitted_at ||
+        attempt.created_at ||
+        attempt.started_at;
+
+
+    if (!date) {
+
+        return "—";
+
+    }
+
+
+    const parsed =
+        new Date(date);
+
+
+    if (
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+
+    return parsed.toLocaleDateString();
+
+}
+
+
+/* =========================================================
+   UPDATE RESULT STATISTICS
+========================================================= */
+
+function updateAdminResultStatistics(
+    attempts
+) {
+
+    const totalAttempts =
+        attempts.length;
+
+
+    /*
+     * Only attempts with an actual result
+     * should be included in score statistics.
+     */
+
+    const completedAttempts =
+        attempts.filter(
+            attempt =>
+                getResultPercentage(
+                    attempt
+                ) !== null
+        );
+
+
+    const percentages =
+        completedAttempts
+            .map(
+                attempt =>
+                    getResultPercentage(
+                        attempt
+                    )
+            )
+            .filter(
+                value =>
+                    value !== null
+            );
+
+
+    /*
+     * Average percentage.
+     */
+
+    let average =
+        0;
+
+
+    if (
+        percentages.length > 0
+    ) {
+
+        const sum =
+            percentages.reduce(
+                (
+                    total,
+                    value
+                ) =>
+                    total + value,
+                0
+            );
+
+
+        average =
+            sum /
+            percentages.length;
+
+    }
+
+
+    /*
+     * Passed attempts.
+     */
+
+    const passedAttempts =
+        completedAttempts.filter(
+            attempt =>
+                getAdminResultStatus(
+                    attempt
+                ) === "passed"
+        ).length;
+
+
+    /*
+     * Pass rate.
+     */
+
+    let passRateValue =
+        0;
+
+
+    if (
+        completedAttempts.length > 0
+    ) {
+
+        passRateValue =
+            (
+                passedAttempts /
+                completedAttempts.length
+            ) * 100;
+
+    }
+
+
+    /*
+     * Today's attempts.
+     */
+
+    const today =
+        new Date();
+
+
+    const todayYear =
+        today.getFullYear();
+
+
+    const todayMonth =
+        today.getMonth();
+
+
+    const todayDate =
+        today.getDate();
+
+
+    const todayAttemptsCount =
+        attempts.filter(
+            attempt => {
+
+                const dateValue =
+                    attempt.submitted_at ||
+                    attempt.created_at ||
+                    attempt.started_at;
+
+
+                if (!dateValue) {
+
+                    return false;
+
+                }
+
+
+                const date =
+                    new Date(
+                        dateValue
+                    );
+
+
+                return (
+                    date.getFullYear() ===
+                        todayYear &&
+
+                    date.getMonth() ===
+                        todayMonth &&
+
+                    date.getDate() ===
+                        todayDate
+                );
+
+            }
+        ).length;
+
+
+    /*
+     * Update cards.
+     */
+
+    const totalResultAttempts =
+        document.getElementById(
+            "totalResultAttempts"
+        );
+
+
+    if (
+        totalResultAttempts
+    ) {
+
+        totalResultAttempts.textContent =
+            totalAttempts;
+
+    }
+
+
+    if (averageScore) {
+
+        averageScore.textContent =
+            percentages.length > 0
+                ? `${average.toFixed(2)}%`
+                : "—";
+
+    }
+
+
+    if (passRate) {
+
+        passRate.textContent =
+            completedAttempts.length > 0
+                ? `${passRateValue.toFixed(2)}%`
+                : "—";
+
+    }
+
+
+    if (todayAttempts) {
+
+        todayAttempts.textContent =
+            todayAttemptsCount;
+
+    }
+
+
+    console.log(
+        "RESULT STATISTICS:",
+        {
+            totalAttempts,
+            completedAttempts:
+                completedAttempts.length,
+            averageScore:
+                average,
+            passRate:
+                passRateValue,
+            todayAttempts:
+                todayAttemptsCount
+        }
+    );
+
+}
+
+
+/* =========================================================
+   POPULATE QUIZ FILTER
+========================================================= */
+
+function populateResultQuizFilter(
+    attempts
+) {
+
+    if (
+        !resultQuizFilter
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Keep the first "All Quizzes"
+     * option.
+     */
+
+    resultQuizFilter.innerHTML = `
+        <option value="all">
+            All Quizzes
+        </option>
+    `;
+
+
+    const quizMap =
+        new Map();
+
+
+    attempts.forEach(
+        attempt => {
+
+            const exam =
+                attempt.exam ||
+                {};
+
+
+            const examId =
+                exam.id ??
+                attempt.exam_id;
+
+
+            const examTitle =
+                exam.title ||
+                exam.name ||
+                `Exam ${examId}`;
+
+
+            if (
+                examId !== undefined &&
+                examId !== null
+            ) {
+
+                quizMap.set(
+                    String(examId),
+                    examTitle
+                );
+
+            }
+
+        }
+    );
+
+
+    quizMap.forEach(
+        (
+            title,
+            id
+        ) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                id;
+
+
+            option.textContent =
+                title;
+
+
+            resultQuizFilter.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FILTER RESULTS
+========================================================= */
+
+function getFilteredAdminResults() {
+
+    const search =
+        resultSearch
+            ? resultSearch.value
+                .trim()
+                .toLowerCase()
+            : "";
+
+
+    const quizFilter =
+        resultQuizFilter
+            ? resultQuizFilter.value
+            : "all";
+
+
+    const statusFilter =
+        resultStatusFilter
+            ? resultStatusFilter.value
+            : "all";
+
+
+    return currentAdminResults.filter(
+        attempt => {
+
+            const studentName =
+                getAttemptStudentName(
+                    attempt
+                ).toLowerCase();
+
+
+            const quizName =
+                getAttemptQuizName(
+                    attempt
+                ).toLowerCase();
+
+
+            /*
+             * Search.
+             */
+
+            if (
+                search &&
+                !studentName.includes(
+                    search
+                ) &&
+                !quizName.includes(
+                    search
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            /*
+             * Quiz filter.
+             */
+
+            if (
+                quizFilter !== "all"
+            ) {
+
+                const examId =
+                    attempt.exam?.id ??
+                    attempt.exam_id;
+
+
+                if (
+                    String(examId) !==
+                    String(quizFilter)
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            /*
+             * Status filter.
+             */
+
+            if (
+                statusFilter !== "all"
+            ) {
+
+                const status =
+                    getAdminResultStatus(
+                        attempt
+                    );
+
+
+                if (
+                    status !==
+                    statusFilter
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RENDER RESULTS TABLE
+========================================================= */
+
+function renderAdminResultsTable(
+    attempts
+) {
+
+    if (
+        !resultsTableBody
+    ) {
+
+        return;
+
+    }
+
+
+    resultsTableBody.innerHTML =
+        "";
+
+
+    if (
+        !attempts ||
+        attempts.length === 0
+    ) {
+
+        resultsTableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="7"
+                    class="empty-table"
+                >
+                    No quiz attempts found.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    attempts.forEach(
+        attempt => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const studentName =
+                getAttemptStudentName(
+                    attempt
+                );
+
+
+            const quizName =
+                getAttemptQuizName(
+                    attempt
+                );
+
+
+            const score =
+                getResultScore(
+                    attempt
+                );
+
+
+            const percentage =
+                getResultPercentage(
+                    attempt
+                );
+
+
+            const status =
+                getAdminResultStatus(
+                    attempt
+                );
+
+
+            let statusText =
+                "Pending";
+
+
+            if (
+                status === "passed"
+            ) {
+
+                statusText =
+                    "Passed";
+
+            }
+
+            else if (
+                status === "failed"
+            ) {
+
+                statusText =
+                    "Failed";
+
+            }
+
+
+            const scoreText =
+                score !== null
+                    ? score.toFixed(2)
+                    : "—";
+
+
+            const percentageText =
+                percentage !== null
+                    ? `${percentage.toFixed(2)}%`
+                    : "—";
+
+
+            const statusClass =
+                status === "passed"
+                    ? "active-status"
+                    : (
+                        status === "failed"
+                            ? "inactive-status"
+                            : ""
+                    );
+
+
+            const dateText =
+                getAttemptDate(
+                    attempt
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+
+                    <div class="table-user">
+
+                        <div class="table-avatar">
+                            ${escapeAdminHtml(
+                                studentName
+                                    .charAt(0)
+                                    .toUpperCase()
+                            )}
+                        </div>
+
+                        ${escapeAdminHtml(
+                            studentName
+                        )}
+
+                    </div>
+
+                </td>
+
+
+                <td>
+                    ${escapeAdminHtml(
+                        quizName
+                    )}
+                </td>
+
+
+                <td>
+                    ${scoreText}
+                </td>
+
+
+                <td>
+                    ${percentageText}
+                </td>
+
+
+                <td>
+
+                    <span
+                        class="status ${statusClass}"
+                    >
+                        ${statusText}
+                    </span>
+
+                </td>
+
+
+                <td>
+                    ${dateText}
+                </td>
+
+
+                <td>
+
+                    <div class="table-actions">
+
+                        <button
+                            type="button"
+                            class="table-action view-result-btn"
+                            data-attempt-id="${attempt.attempt_id ?? attempt.id}"
+                        >
+                            View
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+
+            resultsTableBody.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeAdminHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   RESULT FILTER EVENTS
+========================================================= */
+
+if (
+    resultSearch
+) {
+
+    resultSearch.addEventListener(
+        "input",
+        function () {
+
+            renderAdminResultsTable(
+                getFilteredAdminResults()
+            );
+
+        }
+    );
+
+}
+
+
+if (
+    resultQuizFilter
+) {
+
+    resultQuizFilter.addEventListener(
+        "change",
+        function () {
+
+            renderAdminResultsTable(
+                getFilteredAdminResults()
+            );
+
+        }
+    );
+
+}
+
+
+if (
+    resultStatusFilter
+) {
+
+    resultStatusFilter.addEventListener(
+        "change",
+        function () {
+
+            renderAdminResultsTable(
+                getFilteredAdminResults()
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   VIEW RESULT
+========================================================= */
+
+if (
+    resultsTableBody
+) {
+
+    resultsTableBody.addEventListener(
+        "click",
+        function (event) {
+
+            const button =
+                event.target.closest(
+                    ".view-result-btn"
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            const attemptId =
+                button.dataset.attemptId;
+
+
+            if (!attemptId) {
+
+                return;
+
+            }
+
+
+            console.log(
+                "Selected attempt:",
+                attemptId
+            );
+
+
+            /* =================================================
+               FIND THE SELECTED RESULT
+            ================================================= */
+
+            const attempt =
+                currentAdminResults.find(
+                    item =>
+                        String(
+                            item.attempt_id ??
+                            item.id
+                        ) ===
+                        String(attemptId)
+                );
+
+
+            if (!attempt) {
+
+                console.error(
+                    "Result not found for attempt:",
+                    attemptId
+                );
+
+                return;
+
+            }
+
+
+            /* =================================================
+               GET RESULT DATA
+            ================================================= */
+
+            const result =
+                attempt.result ||
+                attempt.results ||
+                null;
+
+
+            const studentName =
+                getAttemptStudentName(
+                    attempt
+                );
+
+
+            const quizName =
+                getAttemptQuizName(
+                    attempt
+                );
+
+
+            const score =
+                getResultScore(
+                    attempt
+                );
+
+
+            const percentage =
+                getResultPercentage(
+                    attempt
+                );
+
+
+            const status =
+                getAdminResultStatus(
+                    attempt
+                );
+
+
+            const submittedDate =
+                getAttemptDate(
+                    attempt
+                );
+
+
+            /* =================================================
+               GET MODAL
+            ================================================= */
+
+            const modal =
+                document.getElementById(
+                    "viewResultModal"
+                );
+
+
+            if (!modal) {
+
+                console.error(
+                    "View Result modal not found."
+                );
+
+                return;
+
+            }
+
+
+            /* =================================================
+               FILL MODAL
+            ================================================= */
+
+            const studentElement =
+                document.getElementById(
+                    "resultStudent"
+                );
+
+
+            const quizElement =
+                document.getElementById(
+                    "resultQuiz"
+                );
+
+
+            const scoreElement =
+                document.getElementById(
+                    "resultScore"
+                );
+
+
+            const percentageElement =
+                document.getElementById(
+                    "resultPercentage"
+                );
+
+
+            const statusElement =
+                document.getElementById(
+                    "resultStatus"
+                );
+
+
+            const dateElement =
+                document.getElementById(
+                    "resultDate"
+                );
+
+
+            if (studentElement) {
+
+                studentElement.textContent =
+                    studentName;
+
+            }
+
+
+            if (quizElement) {
+
+                quizElement.textContent =
+                    quizName;
+
+            }
+
+
+            if (scoreElement) {
+
+                scoreElement.textContent =
+                    score !== null
+                        ? score.toFixed(2)
+                        : "—";
+
+            }
+
+
+            if (percentageElement) {
+
+                percentageElement.textContent =
+                    percentage !== null
+                        ? `${percentage.toFixed(2)}%`
+                        : "—";
+
+            }
+
+
+            if (statusElement) {
+
+                if (status === "passed") {
+
+                    statusElement.textContent =
+                        "Passed";
+
+                }
+
+                else if (status === "failed") {
+
+                    statusElement.textContent =
+                        "Failed";
+
+                }
+
+                else {
+
+                    statusElement.textContent =
+                        "Pending";
+
+                }
+
+            }
+
+
+            if (dateElement) {
+
+                dateElement.textContent =
+                    submittedDate;
+
+            }
+
+
+            /* =================================================
+               SHOW MODAL
+            ================================================= */
+
+            modal.classList.add(
+                "active"
+            );
+
+            modal.classList.remove(
+                "hidden"
+            );
+
+
+            console.log(
+                "View Result modal opened:",
+                attempt
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE VIEW RESULT MODAL
+========================================================= */
+
+const viewResultModal =
+    document.getElementById(
+        "viewResultModal"
+    );
+
+
+const closeViewResultModal =
+    document.getElementById(
+        "closeViewResultModal"
+    );
+
+
+const closeViewResult =
+    document.getElementById(
+        "closeViewResult"
+    );
+
+
+function closeAdminResultModal() {
+
+    if (!viewResultModal) {
+
+        return;
+
+    }
+
+
+    viewResultModal.classList.remove(
+        "active"
+    );
+
+    viewResultModal.classList.add(
+        "hidden"
+    );
+
+}
+
+
+if (closeViewResultModal) {
+
+    closeViewResultModal.addEventListener(
+        "click",
+        function () {
+
+            closeAdminResultModal();
+
+        }
+    );
+
+}
+
+
+if (closeViewResult) {
+
+    closeViewResult.addEventListener(
+        "click",
+        function () {
+
+            closeAdminResultModal();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL WHEN CLICKING OUTSIDE
+========================================================= */
+
+if (viewResultModal) {
+
+    viewResultModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                viewResultModal
+            ) {
+
+                closeAdminResultModal();
+
+            }
+
+        }
+    );
+
+}
+
     /* =====================================================
        ADMIN AVATAR HELPER
     ===================================================== */
 
-    function setAdminAvatar(element, imageUrl, name) {
+    function setAdminAvatar(
+        element,
+        imageUrl,
+        name
+    ) {
 
         if (!element) {
             return;
         }
+
 
         /*
          * If profile picture exists,
@@ -302,13 +2161,16 @@ document.addEventListener("DOMContentLoaded", () => {
         element.style.backgroundImage =
             "none";
 
+
         const firstLetter =
             name
                 ? name.charAt(0).toUpperCase()
                 : "";
 
+
         element.textContent =
             firstLetter;
+
     }
 
 
@@ -320,11 +2182,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         data = data || {};
 
+
         const name =
             data.name || "";
 
+
         const role =
-            data.role || "ADMIN";
+            String(
+                data.role || "ADMIN"
+            ).toUpperCase();
+
 
         const email =
             data.email || "";
@@ -474,148 +2341,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function loadLoggedInAdmin() {
 
-        console.log(
-            "Loading logged-in admin..."
+    console.log("Loading logged-in admin...");
+
+    const adminToken =
+        localStorage.getItem("admin_access_token");
+
+    if (!adminToken) {
+
+        console.error(
+            "No admin_access_token found."
         );
 
+        window.location.href =
+            "ad-login.html";
 
-        /* =================================================
-           GET ADMIN TOKEN
-        ================================================= */
+        return;
 
-        const adminToken =
-            localStorage.getItem(
-                "admin_access_token"
-            );
+    }
 
 
-        /* =================================================
-           GET ADMIN USER
-        ================================================= */
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT trust admin_user from localStorage
+     * for authentication or authorization.
+     *
+     * The backend /auth/me endpoint is used to
+     * verify the actual logged-in account.
+     */
 
-        const savedAdmin =
-            localStorage.getItem(
-                "admin_user"
-            );
+    fetch(
+        `${API_BASE_URL}/auth/profile`,
+        {
+            method: "GET",
 
+            headers: {
+                "Authorization":
+                    `Bearer ${adminToken}`,
 
-        console.log(
-            "Admin token exists:",
-            Boolean(adminToken)
-        );
-
-        console.log(
-            "Admin user exists:",
-            Boolean(savedAdmin)
-        );
-
-
-        /* =================================================
-           ADMIN TOKEN REQUIRED
-        ================================================= */
-
-        if (!adminToken) {
-
-            console.error(
-                "No admin_access_token found."
-            );
-
-            alert(
-                "Admin session not found. Please login again."
-            );
-
-            window.location.href =
-                "ad-login.html";
-
-            return;
-
+                "Content-Type":
+                    "application/json"
+            }
         }
+    )
+    .then(async response => {
 
-
-        /* =================================================
-           ADMIN USER DATA REQUIRED
-        ================================================= */
-
-        if (!savedAdmin) {
-
-            console.error(
-                "No admin_user found in localStorage."
-            );
-
-            alert(
-                "Admin profile information not found. Please login again."
-            );
-
-            localStorage.removeItem(
-                "admin_access_token"
-            );
-
-            window.location.href =
-                "ad-login.html";
-
-            return;
-
-        }
-
-
-        /* =================================================
-           PARSE ADMIN DATA
-        ================================================= */
-
-        let admin;
+        let data = {};
 
         try {
+            data = await response.json();
+        } catch {
+            data = {};
+        }
 
-            admin =
-                JSON.parse(savedAdmin);
 
-        } catch (error) {
+        /*
+         * Token is invalid or expired.
+         */
 
-            console.error(
-                "Invalid admin_user data:",
-                error
+        if (response.status === 401) {
+
+            throw new Error(
+                "ADMIN_SESSION_EXPIRED"
             );
-
-            localStorage.removeItem(
-                "admin_user"
-            );
-
-            localStorage.removeItem(
-                "admin_access_token"
-            );
-
-            alert(
-                "Invalid admin session. Please login again."
-            );
-
-            window.location.href =
-                "ad-login.html";
-
-            return;
 
         }
 
 
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Unable to load admin profile."
+            );
+
+        }
+
+
+        return data;
+
+    })
+    .then(admin => {
+
         console.log(
-            "Logged-in admin data:",
+            "Authenticated account from backend:",
             admin
         );
 
 
-        /* =================================================
-           SECURITY CHECK
-        ================================================= */
+        /*
+         * SECURITY CHECK
+         *
+         * Only ADMIN accounts are allowed
+         * to use the admin dashboard.
+         */
 
         const role =
             String(
                 admin.role || ""
             ).toUpperCase();
 
-
-        /*
-         * Only ADMIN accounts can open
-         * the Admin Dashboard.
-         */
 
         if (role !== "ADMIN") {
 
@@ -624,6 +2450,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 admin
             );
 
+
             localStorage.removeItem(
                 "admin_access_token"
             );
@@ -632,23 +2459,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 "admin_user"
             );
 
+
             alert(
                 "Unauthorized account. Please login as an administrator."
             );
 
+
             window.location.href =
                 "ad-login.html";
+
 
             return;
 
         }
 
 
-        /* =================================================
-           DISPLAY ADMIN
-        ================================================= */
+        /*
+         * Save the verified backend admin data.
+         *
+         * This keeps admin_user synchronized with
+         * the actual authenticated account.
+         */
+
+        localStorage.setItem(
+            "admin_user",
+            JSON.stringify({
+                id:
+                    admin.id,
+
+                name:
+                    admin.name || "",
+
+                email:
+                    admin.email || "",
+
+                role:
+                    role
+            })
+        );
+
+
+        /*
+         * Display verified admin information.
+         */
 
         updateAdminProfile({
+
+            id:
+                admin.id,
 
             name:
                 admin.name || "",
@@ -657,11 +2515,63 @@ document.addEventListener("DOMContentLoaded", () => {
                 admin.email || "",
 
             role:
-                admin.role || "ADMIN"
+                role
 
         });
 
-    }
+    })
+    .catch(error => {
+
+        console.error(
+            "Admin authentication error:",
+            error
+        );
+
+
+        /*
+         * Invalid / expired admin token.
+         */
+
+        if (
+            error.message ===
+            "ADMIN_SESSION_EXPIRED"
+        ) {
+
+            localStorage.removeItem(
+                "admin_access_token"
+            );
+
+            localStorage.removeItem(
+                "admin_user"
+            );
+
+
+            alert(
+                "Your admin session has expired. Please login again."
+            );
+
+
+            window.location.href =
+                "ad-login.html";
+
+
+            return;
+
+        }
+
+
+        /*
+         * Other authentication/profile errors.
+         */
+
+        alert(
+            error.message ||
+            "Unable to verify admin session."
+        );
+
+    });
+
+}
 
 
     /* =====================================================
@@ -726,8 +2636,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const name =
                 user.name || "Unknown";
 
+
             const email =
                 user.email || "-";
+
 
             const status =
                 user.status || "Active";
@@ -799,6 +2711,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             Edit
                         </button>
 
+                        <button
+                        class="table-action access-user-btn"
+                        data-user-id="${user.id}">
+                        Access
+                        </button>
+
                     </div>
 
                 </td>
@@ -813,13 +2731,121 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /*
-     * Initially show empty table.
-     *
-     * Real backend user loading can be connected later.
-     */
-
     updateUsersTable([]);
+
+
+    /* =====================================================
+       LOAD REGISTERED STUDENTS FROM BACKEND
+       
+       The Users section is intended to display students.
+       
+       The dashboard count itself is separately calculated
+       from total_students.
+    ===================================================== */
+
+    async function loadUsers() {
+
+        try {
+
+            const adminToken =
+                localStorage.getItem(
+                    "admin_access_token"
+                );
+
+
+            if (!adminToken) {
+
+                console.error(
+                    "Admin access token not found."
+                );
+
+                return;
+
+            }
+
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/admin/users`,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${adminToken}`,
+
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Failed to load users: ${response.status}`
+                );
+
+            }
+
+
+            const users =
+                await response.json();
+
+
+            console.log(
+                "Registered users loaded:",
+                users
+            );
+
+
+            /*
+             * Keep only student accounts in the
+             * Admin Users table if the backend
+             * returns both students and admins.
+             */
+
+            const students =
+                Array.isArray(users)
+                    ? users.filter(user => {
+
+                        const role =
+                            String(
+                                user.role || "STUDENT"
+                            ).toUpperCase();
+
+                        return role === "STUDENT";
+
+                    })
+                    : [];
+
+
+            updateUsersTable(
+                students
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error loading registered users:",
+                error
+            );
+
+
+            updateUsersTable([]);
+
+        }
+
+    }
+
+
+    /* =====================================================
+       LOAD USERS WHEN ADMIN DASHBOARD OPENS
+    ===================================================== */
+
+    loadUsers();
 
 
     /* =====================================================
@@ -873,12 +2899,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             const questionsCount =
-                quiz.questions_count ?? 0;
+                quiz.questions_count ??
+                quiz.question_count ??
+                quiz.total_questions ??
+                quiz.questions?.length ??
+                0;
 
 
             const status =
+                String(
                 quiz.status ||
-                "Draft";
+                "Draft"
+                );
 
 
             const created =
@@ -953,57 +2985,218 @@ document.addEventListener("DOMContentLoaded", () => {
        LOAD PUBLISHED QUIZZES
     ===================================================== */
 
-function loadPublishedQuizzes() {
+
+    async function loadPublishedQuizzes() {
+
     try {
-        const quizzes = JSON.parse(
-            localStorage.getItem("admin_quizzes") || "[]"
+
+        const adminToken =
+            localStorage.getItem(
+                "admin_access_token"
+            );
+
+
+        if (!adminToken) {
+
+            console.error(
+                "Admin access token not found."
+            );
+
+            updateQuizzesTable([]);
+
+            return;
+
+        }
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/admin/exams`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${adminToken}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Failed to load quizzes: ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Quizzes loaded from backend:",
+            data
         );
 
-        updateQuizzesTable(quizzes);
 
-        console.log("Quizzes loaded:", quizzes);
+        const quizzes =
+            Array.isArray(data)
+                ? data
+                : Array.isArray(data.exams)
+                    ? data.exams
+                    : [];
+
+
+        updateQuizzesTable(
+            quizzes
+        );
+
+
     } catch (error) {
-        console.error("Error loading quizzes:", error);
+
+        console.error(
+            "Error loading quizzes from backend:",
+            error
+        );
+
+
         updateQuizzesTable([]);
+
     }
+
 }
 
 
+loadPublishedQuizzes();
+loadAdminResults();
+
     /* =====================================================
-       DELETE QUIZ
-    ===================================================== */
+   DELETE QUIZ
+===================================================== */
 
-    document.addEventListener(
-        "click",
-        function(event) {
+document.addEventListener(
+    "click",
+    async function(event) {
 
-            const deleteButton =
-                event.target.closest(
-                    ".delete-quiz-btn"
+        const deleteButton =
+            event.target.closest(
+                ".delete-quiz-btn"
+            );
+
+        if (!deleteButton) {
+            return;
+        }
+
+        const quizId =
+            deleteButton.dataset.quizId;
+
+        if (!quizId) {
+            return;
+        }
+
+        const token =
+            localStorage.getItem(
+                "admin_access_token"
+            );
+
+        if (!token) {
+            window.location.href =
+                "ad-login.html";
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to delete this quiz?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/admin/exams/${quizId}`,
+                    {
+                        method: "DELETE",
+
+                        headers: {
+                            "Authorization":
+                                `Bearer ${token}`
+                        }
+                    }
                 );
 
+            const data =
+                await response.json()
+                    .catch(() => ({}));
 
-            if (!deleteButton) {
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                localStorage.removeItem(
+                    "admin_access_token"
+                );
+
+                localStorage.removeItem(
+                    "admin_user"
+                );
+
+                window.location.href =
+                    "ad-login.html";
+
                 return;
             }
 
 
-            const quizId =
-                deleteButton.dataset.quizId;
+            if (!response.ok) {
 
+                throw new Error(
+                    data.detail ||
+                    "Unable to delete quiz"
+                );
 
-            if (!quizId) {
-                return;
             }
 
 
             alert(
-                "Quiz deletion is ready. " +
-                "Backend integration will be added later."
+                data.message ||
+                "Quiz deleted successfully."
+            );
+
+
+            await loadPublishedQuizzes();
+
+            await loadDashboardStats();
+
+
+        } catch (error) {
+
+            console.error(
+                "Delete quiz error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Failed to delete quiz."
             );
 
         }
-    );
+
+    }
+);
 
 
     /* =====================================================
@@ -1080,7 +3273,6 @@ function loadPublishedQuizzes() {
     );
 
 
-    loadPublishedQuizzes();
 
 
     /* =====================================================
@@ -1856,28 +4048,242 @@ function loadPublishedQuizzes() {
 
     }
 
+/* =====================================================
+   SAVE EDITED USER
+===================================================== */
 
-    if (editUserForm) {
+if (editUserForm) {
 
-        editUserForm.addEventListener(
-            "submit",
-            event => {
+    editUserForm.addEventListener(
+        "submit",
+        async event => {
 
-                event.preventDefault();
+            event.preventDefault();
 
+
+            const token =
+                localStorage.getItem(
+                    "admin_access_token"
+                );
+
+
+            if (!token) {
 
                 alert(
-                    "User editing is ready. " +
-                    "Backend integration will be added later."
+                    "Admin session expired. Please login again."
+                );
+
+                window.location.href =
+                    "ad-login.html";
+
+                return;
+
+            }
+
+
+            const userId =
+                editUserId?.value;
+
+
+            if (!userId) {
+
+                alert(
+                    "User ID is missing."
+                );
+
+                return;
+
+            }
+
+
+            const name =
+                editUserName?.value.trim() ||
+                "";
+
+
+            const email =
+                editUserEmail?.value.trim() ||
+                "";
+
+
+            if (!name) {
+
+                alert(
+                    "Please enter the user's name."
+                );
+
+                editUserName?.focus();
+
+                return;
+
+            }
+
+
+            if (!email) {
+
+                alert(
+                    "Please enter the user's email."
+                );
+
+                editUserEmail?.focus();
+
+                return;
+
+            }
+
+
+            const submitButton =
+                editUserForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            try {
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Saving...";
+
+                }
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/admin/users/${encodeURIComponent(userId)}`,
+                        {
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    `Bearer ${token}`
+                            },
+
+                            body: JSON.stringify({
+                                name: name,
+                                email: email
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json()
+                        .catch(() => ({}));
+
+
+                /* =================================================
+                   SESSION EXPIRED
+                ================================================= */
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    localStorage.removeItem(
+                        "admin_access_token"
+                    );
+
+                    localStorage.removeItem(
+                        "admin_user"
+                    );
+
+
+                    alert(
+                        "Your admin session has expired. Please login again."
+                    );
+
+
+                    window.location.href =
+                        "ad-login.html";
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   BACKEND ERROR
+                ================================================= */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.message ||
+                        "Failed to update user."
+                    );
+
+                }
+
+
+                /* =================================================
+                   SUCCESS
+                ================================================= */
+
+                alert(
+                    data.message ||
+                    "User updated successfully."
                 );
 
 
                 closeEditUserModalWindow();
 
-            }
-        );
 
-    }
+                /* =================================================
+                   REFRESH USERS
+                ================================================= */
+
+                await loadUsers();
+
+
+                /* =================================================
+                   REFRESH DASHBOARD
+                ================================================= */
+
+                await loadDashboardStats();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Edit user error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to update user."
+                );
+
+
+            } finally {
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Save Changes";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
 
 
     /* =====================================================
@@ -1954,6 +4360,19 @@ function loadPublishedQuizzes() {
                     );
 
                 }
+            
+                if (
+                button.classList.contains(
+                "access-user-btn"
+                )
+                ) {
+
+                window.location.href =
+                `user-access.html?user_id=${encodeURIComponent(
+                userId
+                )}`;
+
+}
 
             }
         );
@@ -2065,45 +4484,237 @@ function loadPublishedQuizzes() {
     }
 
 
-    /* =====================================================
-       ADMIN SETTINGS
-    ===================================================== */
+/* =====================================================
+   ADMIN SETTINGS
+===================================================== */
 
-    const saveAdminSettings =
-        document.getElementById(
-            "saveAdminSettings"
-        );
-
-
-    /*
-     * DO NOT call:
-     *
-     * updateAdminProfile({
-     *     name: "",
-     *     email: "",
-     *     role: ""
-     * });
-     *
-     * because that would overwrite the actual
-     * logged-in admin information.
-     */
+const saveAdminSettings =
+    document.getElementById(
+        "saveAdminSettings"
+    );
 
 
-    if (saveAdminSettings) {
+if (saveAdminSettings) {
 
-        saveAdminSettings.addEventListener(
-            "click",
-            () => {
+    saveAdminSettings.addEventListener(
+        "click",
+        async () => {
 
-                alert(
-                    "Admin profile will be connected to the backend."
+            const token =
+                localStorage.getItem(
+                    "admin_access_token"
                 );
 
+
+            if (!token) {
+
+                alert(
+                    "Admin session expired. Please login again."
+                );
+
+                window.location.href =
+                    "ad-login.html";
+
+                return;
+
             }
-        );
 
-    }
 
+            const name =
+                settingsAdminName?.value.trim() ||
+                "";
+
+
+            const email =
+                settingsAdminEmail?.value.trim() ||
+                "";
+
+
+            /* =================================================
+               VALIDATION
+            ================================================= */
+
+            if (!name) {
+
+                alert(
+                    "Please enter the admin name."
+                );
+
+                settingsAdminName?.focus();
+
+                return;
+
+            }
+
+
+            if (!email) {
+
+                alert(
+                    "Please enter the admin email."
+                );
+
+                settingsAdminEmail?.focus();
+
+                return;
+
+            }
+
+
+            try {
+
+                saveAdminSettings.disabled =
+                    true;
+
+                saveAdminSettings.textContent =
+                    "Saving...";
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/auth/admin/profile`,
+                        {
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    `Bearer ${token}`
+                            },
+
+                            body: JSON.stringify({
+                                name: name,
+                                email: email
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json()
+                        .catch(() => ({}));
+
+
+                /* =================================================
+                   SESSION EXPIRED
+                ================================================= */
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    localStorage.removeItem(
+                        "admin_access_token"
+                    );
+
+                    localStorage.removeItem(
+                        "admin_user"
+                    );
+
+
+                    alert(
+                        "Your admin session has expired. Please login again."
+                    );
+
+
+                    window.location.href =
+                        "ad-login.html";
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   BACKEND ERROR
+                ================================================= */
+
+                if (!response.ok) {
+
+                    alert(
+                        data.detail ||
+                        data.message ||
+                        "Failed to update admin profile."
+                    );
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   UPDATE LOCAL ADMIN DATA
+                ================================================= */
+
+                const updatedAdmin = {
+
+                    id:
+                        data.user_id,
+
+                    name:
+                        data.name,
+
+                    email:
+                        data.email,
+
+                    role:
+                        data.role
+
+                };
+
+
+                localStorage.setItem(
+                    "admin_user",
+                    JSON.stringify(
+                        updatedAdmin
+                    )
+                );
+
+
+                /* =================================================
+                   UPDATE PAGE
+                ================================================= */
+
+                updateAdminProfile(
+                    updatedAdmin
+                );
+
+
+                alert(
+                    data.message ||
+                    "Admin profile updated successfully."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Admin profile update error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to connect to the backend. Make sure FastAPI is running."
+                );
+
+
+            } finally {
+
+                saveAdminSettings.disabled =
+                    false;
+
+                saveAdminSettings.textContent =
+                    "Save Changes";
+
+            }
+
+        }
+    );
+
+}
 
     /* =====================================================
        LOGOUT
@@ -2135,12 +4746,13 @@ function loadPublishedQuizzes() {
                 /*
                  * Remove ONLY admin authentication.
                  *
-                 * Student authentication is kept separate.
+                 * Student authentication remains separate.
                  */
 
                 localStorage.removeItem(
                     "admin_access_token"
                 );
+
 
                 localStorage.removeItem(
                     "admin_user"
@@ -2280,28 +4892,306 @@ function loadPublishedQuizzes() {
     }
 
 
-    if (addUserForm) {
+if (addUserForm) {
 
-        addUserForm.addEventListener(
-            "submit",
-            event => {
+    addUserForm.addEventListener(
+        "submit",
+        async event => {
 
-                event.preventDefault();
+            event.preventDefault();
 
 
-                alert(
-                    "The Add User form is ready. " +
-                    "Backend integration will be added later."
+            const token =
+                localStorage.getItem(
+                    "admin_access_token"
                 );
 
 
-                closeAddUserModalWindow();
+            if (!token) {
+
+                alert(
+                    "Admin session expired. Please login again."
+                );
+
+                window.location.href =
+                    "ad-login.html";
+
+                return;
 
             }
-        );
 
-    }
 
+            /*
+             * Get Add User form inputs.
+             */
+
+            const nameInput =
+                document.getElementById(
+                    "addUserName"
+                );
+
+            const emailInput =
+                document.getElementById(
+                    "addUserEmail"
+                );
+
+            const passwordInput =
+                document.getElementById(
+                    "addUserPassword"
+                );
+
+
+            if (
+                !nameInput ||
+                !emailInput ||
+                !passwordInput
+            ) {
+
+                console.error(
+                    "Add User form inputs were not found."
+                );
+
+                alert(
+                    "Add User form fields could not be found."
+                );
+
+                return;
+
+            }
+
+
+            const name =
+                nameInput.value.trim();
+
+
+            const email =
+                emailInput.value.trim();
+
+
+            const password =
+                passwordInput.value;
+
+
+            /* =================================================
+               VALIDATION
+            ================================================= */
+
+            if (!name) {
+
+                alert(
+                    "Please enter the user's name."
+                );
+
+                nameInput.focus();
+
+                return;
+
+            }
+
+
+            if (!email) {
+
+                alert(
+                    "Please enter the user's email."
+                );
+
+                emailInput.focus();
+
+                return;
+
+            }
+
+
+            if (!password) {
+
+                alert(
+                    "Please enter a password."
+                );
+
+                passwordInput.focus();
+
+                return;
+
+            }
+
+
+            if (password.length < 6) {
+
+                alert(
+                    "Password must contain at least 6 characters."
+                );
+
+                passwordInput.focus();
+
+                return;
+
+            }
+
+
+            /*
+             * Find the actual submit button
+             * inside the Add User form.
+             */
+
+            const submitButton =
+                addUserForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            try {
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Adding...";
+
+                }
+
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/admin/users`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    `Bearer ${token}`
+                            },
+
+                            body: JSON.stringify({
+                                name: name,
+                                email: email,
+                                password: password
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json()
+                        .catch(
+                            () => ({})
+                        );
+
+
+                /* =================================================
+                   SESSION EXPIRED / UNAUTHORIZED
+                ================================================= */
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    localStorage.removeItem(
+                        "admin_access_token"
+                    );
+
+                    localStorage.removeItem(
+                        "admin_user"
+                    );
+
+
+                    alert(
+                        "Your admin session has expired. " +
+                        "Please login again."
+                    );
+
+
+                    window.location.href =
+                        "ad-login.html";
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   BACKEND ERROR
+                ================================================= */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.message ||
+                        "Failed to create user."
+                    );
+
+                }
+
+
+                /* =================================================
+                   SUCCESS
+                ================================================= */
+
+                alert(
+                    data.message ||
+                    "User created successfully."
+                );
+
+
+                /*
+                 * Reload users from PostgreSQL.
+                 */
+
+                await loadUsers();
+
+
+                /*
+                 * Refresh dashboard student count.
+                 */
+
+                await loadDashboardStats();
+
+
+                /*
+                 * Close modal and reset form.
+                 */
+
+                closeAddUserModalWindow();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Add user error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to create user."
+                );
+
+
+            } finally {
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Add User";
+
+                }
+
+            }
+
+        }
+    );
+
+}
 
     /* =====================================================
        PROFILE PICTURE MANAGEMENT
@@ -2337,6 +5227,7 @@ function loadPublishedQuizzes() {
 
         let adminName = "";
 
+
         const savedAdmin =
             localStorage.getItem(
                 "admin_user"
@@ -2351,6 +5242,7 @@ function loadPublishedQuizzes() {
                     JSON.parse(
                         savedAdmin
                     );
+
 
                 adminName =
                     admin.name || "";
@@ -2707,9 +5599,11 @@ function loadPublishedQuizzes() {
                     currentPasswordInput?.value ||
                     "";
 
+
                 const newPassword =
                     newPasswordInput?.value ||
                     "";
+
 
                 const confirmPassword =
                     confirmPasswordInput?.value ||
@@ -2932,6 +5826,7 @@ function loadPublishedQuizzes() {
                             "admin_access_token"
                         );
 
+
                         localStorage.removeItem(
                             "admin_user"
                         );
@@ -3017,13 +5912,11 @@ function loadPublishedQuizzes() {
 
 
     /* =====================================================
-       LOAD ADMIN PROFILE LAST
-       
-       This is intentionally at the end so all DOM elements
-       are already available before profile information
-       is displayed.
+       LOAD ADMIN PROFILE AND DASHBOARD DATA
     ===================================================== */
 
     loadLoggedInAdmin();
+
+    loadDashboardStats();
 
 });

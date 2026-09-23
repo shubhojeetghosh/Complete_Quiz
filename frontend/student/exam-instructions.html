@@ -1203,33 +1203,20 @@
        SELECTED CATEGORY + SET
        ========================================= */
 
-    const params =
-      new URLSearchParams(
-        window.location.search
-      );
+    const params = new URLSearchParams(window.location.search);
 
+const examId = params.get("exam");
+const requestedSet = Number(params.get("set"));
 
-    const category =
-      params.get("category") ||
-      "vowels";
+if (!examId || !Number.isInteger(requestedSet)) {
+  alert("Exam information is missing. Please select the exam again.");
+  window.location.href = "set.html";
+  throw new Error("Missing exam or set ID");
+}
 
+const setId = requestedSet;
 
-    const requestedSet =
-      Number(params.get("set"));
-
-
-    const setId =
-      Number.isInteger(requestedSet) &&
-      requestedSet >= 1 &&
-      requestedSet <= 21
-        ? requestedSet
-        : 1;
-
-
-    const formattedSet =
-      String(setId)
-        .padStart(2, "0");
-
+const formattedSet = String(setId).padStart(2, "0");
 
 
     const categoryNames = {
@@ -1261,10 +1248,7 @@
     };
 
 
-    const categoryName =
-      categoryNames[category] ||
-      "EPS TOPIK";
-
+   const categoryName = "EPS TOPIK";
 
     /* Set information */
 
@@ -1456,14 +1440,13 @@
        ========================================= */
 
     startBtn.addEventListener(
-      "click",
-      function () {
-
-        window.location.href =
-          `question-nav.html?category=${encodeURIComponent(category)}&set=${setId}`;
-
-      }
-    );
+  "click",
+  function () {
+    window.location.href =
+      `exam.html?exam=${encodeURIComponent(examId)}` +
+      `&set=${encodeURIComponent(setId)}`;
+  }
+);
 
 
 

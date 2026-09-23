@@ -100,21 +100,17 @@
     </div>
 
 
-    <span class="dashboard-eyebrow">
-      EXAM COMPLETED
-    </span>
+  <span class="dashboard-eyebrow" id="resultHeaderLabel">
+  EXAM COMPLETED
+</span>
 
+<h1 id="resultHeaderTitle">
+  Exam Result
+</h1>
 
-    <h1>
-      Test completed successfully!
-    </h1>
-
-
-    <p>
-      Your EPS TOPIK examination has been submitted.
-      Here's a detailed overview of your performance.
-    </p>
-
+<p id="resultHeaderMessage">
+  Your examination result is shown below.
+</p>
 
   </section>
 
@@ -136,9 +132,7 @@
 
         <div>
 
-          <strong id="resultPercentage">
-            82%
-          </strong>
+          <strong id="resultPercentage"></strong>
 
           <span>
             Your Score
@@ -150,17 +144,12 @@
 
 
       <span
-        class="result-status passed-result"
-        id="resultStatus"
-      >
-        PASSED
-      </span>
+  class="result-status"
+  id="resultStatus"
+></span>
 
 
-      <p>
-        Great work! You have successfully completed
-        this EPS TOPIK practice test.
-      </p>
+      <p id="resultMessage"></p>
 
 
     </div>
@@ -178,13 +167,9 @@
           TEST RESULT
         </span>
 
-        <h2 id="resultTestName">
-          Set No. 01
-        </h2>
+        <h2 id="resultTestName"></h2>
 
-        <p>
-          EPS TOPIK Reading &amp; Listening
-        </p>
+        <p id="resultExamType"></p>
 
       </div>
 
@@ -201,9 +186,7 @@
             Total Score
           </span>
 
-          <strong id="resultScore">
-            164 / 200
-          </strong>
+          <strong id="resultScore"></strong>
 
         </article>
 
@@ -217,9 +200,7 @@
             Correct
           </span>
 
-          <strong class="correct-text" id="correctAnswers">
-            33
-          </strong>
+          <strong class="correct-text" id="correctAnswers"></strong>
 
         </article>
 
@@ -233,9 +214,7 @@
             Incorrect
           </span>
 
-          <strong class="wrong-text" id="wrongAnswers">
-            6
-          </strong>
+          <strong class="wrong-text" id="wrongAnswers"></strong>
 
         </article>
 
@@ -249,9 +228,7 @@
             Unanswered
           </span>
 
-          <strong id="unansweredAnswers">
-            1
-          </strong>
+          <strong id="unansweredAnswers"></strong>
 
         </article>
 
@@ -314,36 +291,28 @@
           </div>
 
 
-          <strong id="readingPercentage">
-            85%
-          </strong>
+          <strong id="readingPercentage"></strong>
 
         </div>
 
 
 
-        <div class="performance-bar">
+       <div class="performance-bar">
 
-          <div
-            class="performance-bar-fill"
-            style="width: 85%;"
-          ></div>
+  <div
+    class="performance-bar-fill"
+    id="readingBar"
+  ></div>
 
-        </div>
+</div>
 
+<div class="performance-details">
 
+  <span id="readingCorrect"></span>
 
-        <div class="performance-details">
+  <strong id="readingScore"></strong>
 
-          <span>
-            17 / 20 Correct
-          </span>
-
-          <strong>
-            85 / 100
-          </strong>
-
-        </div>
+</div>
 
 
       </article>
@@ -370,9 +339,7 @@
           </div>
 
 
-          <strong id="listeningPercentage">
-            79%
-          </strong>
+          <strong id="listeningPercentage"></strong>
 
         </div>
 
@@ -380,26 +347,21 @@
 
         <div class="performance-bar">
 
-          <div
-            class="performance-bar-fill"
-            style="width: 79%;"
-          ></div>
+  
+        <div
+        class="performance-bar-fill"
+        id="listeningBar"
+        ></div>
 
-        </div>
+</div>
 
+<div class="performance-details">
 
+  <span id="listeningCorrect"></span>
 
-        <div class="performance-details">
+  <strong id="listeningScore"></strong>
 
-          <span>
-            16 / 20 Correct
-          </span>
-
-          <strong>
-            79 / 100
-          </strong>
-
-        </div>
+</div>
 
 
       </article>
@@ -469,91 +431,10 @@
 
     <!-- QUESTION BUTTONS -->
 
-    <div class="question-result-grid">
-
-
-      <button class="question-result correct-question">
-        1
-      </button>
-
-      <button class="question-result correct-question">
-        2
-      </button>
-
-      <button class="question-result wrong-question">
-        3
-      </button>
-
-      <button class="question-result correct-question">
-        4
-      </button>
-
-      <button class="question-result correct-question">
-        5
-      </button>
-
-      <button class="question-result wrong-question">
-        6
-      </button>
-
-      <button class="question-result correct-question">
-        7
-      </button>
-
-      <button class="question-result correct-question">
-        8
-      </button>
-
-      <button class="question-result unanswered-question">
-        9
-      </button>
-
-      <button class="question-result correct-question">
-        10
-      </button>
-
-      <button class="question-result correct-question">
-        11
-      </button>
-
-      <button class="question-result wrong-question">
-        12
-      </button>
-
-      <button class="question-result correct-question">
-        13
-      </button>
-
-      <button class="question-result correct-question">
-        14
-      </button>
-
-      <button class="question-result correct-question">
-        15
-      </button>
-
-      <button class="question-result correct-question">
-        16
-      </button>
-
-      <button class="question-result wrong-question">
-        17
-      </button>
-
-      <button class="question-result correct-question">
-        18
-      </button>
-
-      <button class="question-result correct-question">
-        19
-      </button>
-
-      <button class="question-result correct-question">
-        20
-      </button>
-
-
-    </div>
+   <div
+  class="question-result-grid"
+  id="questionResultGrid"
+></div>
 
 
   </section>
@@ -577,10 +458,7 @@
         Continue your preparation
       </h3>
 
-      <p>
-        Review your mistakes or take the test again
-        to improve your score.
-      </p>
+     <p id="resultActionMessage"></p>
 
     </div>
 
@@ -652,9 +530,7 @@
 
 <footer class="dashboard-footer">
 
-  <p>
-    © 2026 EPS TOPIK Exam Platform
-  </p>
+ <p id="footerCopyright"></p>
 
 
   <div>
@@ -678,6 +554,7 @@
 
 
 <script src="script.js"></script>
+<script src="answers.js"></script>
 
 </body>
 

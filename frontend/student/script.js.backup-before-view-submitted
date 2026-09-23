@@ -2132,6 +2132,71 @@ async function loadDashboardProfile() {
                 getUserInitials(name);
 
         }
+        /* =========================================================
+   STUDENT DASHBOARD DATA
+   ========================================================= */
+
+/* =========================================================
+   DASHBOARD PROGRESS
+   ========================================================= */
+
+function renderDashboardProgress(progress) {
+
+    if (!progress) {
+        return;
+    }
+
+
+    /* Progress percentage */
+
+    const percentage =
+        document.getElementById(
+            "progressPercentage"
+        );
+
+    if (percentage) {
+
+        percentage.textContent =
+            `${Number(
+                progress.percentage || 0
+            ).toFixed(0)}%`;
+
+    }
+
+
+    /* Tests completed */
+
+    const completed =
+        document.getElementById(
+            "progressTestsCompleted"
+        );
+
+    if (completed) {
+
+        completed.textContent =
+            `${progress.completed || 0} / ${progress.total || 0}`;
+
+    }
+
+
+    /* Average score */
+
+    const average =
+        document.getElementById(
+            "progressAverageScore"
+        );
+
+    if (average) {
+
+        average.textContent =
+            `${Number(
+                progress.average_score || 0
+            ).toFixed(1)}%`;
+
+    }
+
+}
+
 
         /* =================================================
            NAVBAR
@@ -2183,65 +2248,6 @@ async function loadDashboardProfile() {
 }
 
 
-/* =========================================================
-   DASHBOARD PROGRESS
-   ========================================================= */
-
-function renderDashboardProgress(progress) {
-
-    if (!progress) {
-        return;
-    }
-
-    /* Progress percentage */
-
-    const percentage =
-        document.getElementById(
-            "progressPercentage"
-        );
-
-    if (percentage) {
-
-        percentage.textContent =
-            `${Number(
-                progress.percentage || 0
-            ).toFixed(0)}%`;
-
-    }
-
-
-    /* Tests completed */
-
-    const completed =
-        document.getElementById(
-            "progressTestsCompleted"
-        );
-
-    if (completed) {
-
-        completed.textContent =
-            `${progress.completed || 0} / ${progress.total || 0}`;
-
-    }
-
-
-    /* Average score */
-
-    const average =
-        document.getElementById(
-            "progressAverageScore"
-        );
-
-    if (average) {
-
-        average.textContent =
-            `${Number(
-                progress.average_score || 0
-            ).toFixed(1)}%`;
-
-    }
-
-}
 
 /* =========================================================
    STUDENT DASHBOARD DATA
@@ -2393,17 +2399,21 @@ async function loadStudentDashboard() {
          * /api/quizzes, so do not send
          * undefined data into them.
          */
+
         renderDashboardStats({
-        tests_completed: 0,
-        average_score: 0
+            tests_completed: 0,
+            average_score: 0
         });
 
         renderDashboardProgress({
-        completed: 0,
-        total: tests.length,
-        percentage: 0,
-        average_score: 0
+            completed: 0,
+            total: tests.length
         });
+
+        renderScoreTrend(
+            [],
+            null
+        );
 
         renderRecentResults(
             []
@@ -2419,8 +2429,6 @@ async function loadStudentDashboard() {
     }
 
 }
-
-
 /* =========================================================
    RECENT RESULTS
    ========================================================= */
@@ -3842,7 +3850,6 @@ function closeSubmitModal() {
 async function submitExamToBackend(autoSubmit = false) {
 
     if (!studentAttemptId) {
-
         console.error(
             "Cannot submit exam: attempt ID is missing."
         );
@@ -3854,13 +3861,10 @@ async function submitExamToBackend(autoSubmit = false) {
         return;
     }
 
-
     const token =
         localStorage.getItem("access_token");
 
-
     if (!token) {
-
         console.error(
             "Cannot submit exam: access token is missing."
         );
@@ -3872,74 +3876,65 @@ async function submitExamToBackend(autoSubmit = false) {
         return;
     }
 
-
     try {
 
-        /* =====================================================
-   STEP 1
-   SAVE EVERY SELECTED ANSWER IN PARALLEL
-   ===================================================== */
+        /*
+         * First save every selected answer to the backend.
+         */
+        for (
+            const questionId of Object.keys(selectedAnswers)
+        ) {
 
-const answerRequests =
-    Object.entries(selectedAnswers)
-        .filter(
-            ([questionId, selectedOptionId]) =>
-                selectedOptionId
-        )
-        .map(
-            async ([questionId, selectedOptionId]) => {
+            const selectedOptionId =
+                selectedAnswers[questionId];
 
-                const response =
-                    await fetch(
-                        `${API_BASE_URL}/api/attempts/${encodeURIComponent(studentAttemptId)}/answer`,
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json",
-
-                                "Authorization":
-                                    `Bearer ${token}`
-                            },
-
-                            body: JSON.stringify({
-                                question_id:
-                                    String(questionId),
-
-                                selected_option_id:
-                                    String(selectedOptionId)
-                            })
-                        }
-                    );
-
-                if (!response.ok) {
-
-                    const errorText =
-                        await response.text();
-
-                    console.error(
-                        "Failed to save answer:",
-                        errorText
-                    );
-
-                    throw new Error(
-                        `Failed to save answer for question ${questionId}.`
-                    );
-                }
-
-                return response;
+            if (!selectedOptionId) {
+                continue;
             }
-        );
 
-/* Wait for all answers to finish */
-await Promise.all(answerRequests);
+            const answerResponse =
+                await fetch(
+                    `${API_BASE_URL}/api/attempts/${encodeURIComponent(studentAttemptId)}/answer`,
+                    {
+                        method: "POST",
 
-        /* =====================================================
-           STEP 2
-           SUBMIT THE ATTEMPT
-           ===================================================== */
+                        headers: {
+                            "Content-Type":
+                                "application/json",
 
+                            "Authorization":
+                                `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            question_id:
+                                String(questionId),
+
+                            selected_option_id:
+                                String(selectedOptionId)
+                        })
+                    }
+                );
+
+            if (!answerResponse.ok) {
+
+                const errorText =
+                    await answerResponse.text();
+
+                console.error(
+                    "Failed to save answer:",
+                    errorText
+                );
+
+                throw new Error(
+                    `Failed to save answer for question ${questionId}.`
+                );
+            }
+        }
+
+        /*
+         * Now permanently submit the attempt.
+         */
         const submitResponse =
             await fetch(
                 `${API_BASE_URL}/api/attempts/${encodeURIComponent(studentAttemptId)}/submit`,
@@ -3953,10 +3948,8 @@ await Promise.all(answerRequests);
                 }
             );
 
-
         const submitData =
             await submitResponse.json();
-
 
         if (!submitResponse.ok) {
 
@@ -3965,27 +3958,21 @@ await Promise.all(answerRequests);
                 submitData
             );
 
-
             throw new Error(
                 submitData.detail ||
                 "Failed to submit the exam."
             );
         }
 
-
         console.log(
             "EXAM SUBMITTED SUCCESSFULLY:",
             submitData
         );
 
-
-        /* =====================================================
-           STEP 3
-           STOP FRONTEND TIMERS
-           ===================================================== */
-
+        /*
+         * Stop both frontend timers.
+         */
         if (examTimerInterval) {
-
             clearInterval(
                 examTimerInterval
             );
@@ -3993,9 +3980,7 @@ await Promise.all(answerRequests);
             examTimerInterval = null;
         }
 
-
         if (examTimerSyncInterval) {
-
             clearInterval(
                 examTimerSyncInterval
             );
@@ -4003,101 +3988,77 @@ await Promise.all(answerRequests);
             examTimerSyncInterval = null;
         }
 
-
-        /* =====================================================
-           STEP 4
-           CLOSE SUBMIT MODAL
-           ===================================================== */
-
+        /*
+         * Close the confirmation modal.
+         */
         closeSubmitModal();
 
+        /*
+         * Update result information.
+         */
+        const total =
+            studentExamQuestions.length;
 
-        /* =====================================================
-           STEP 5
-           GET FINAL RESULT FROM BACKEND
-           ===================================================== */
+        const answered =
+            Object.keys(selectedAnswers).length;
 
-        const resultResponse =
-            await fetch(
-                `${API_BASE_URL}/api/attempts/${encodeURIComponent(studentAttemptId)}/result`,
-                {
-                    method: "GET",
+        const unanswered =
+            total - answered;
 
-                    headers: {
-                        "Authorization":
-                            `Bearer ${token}`,
-
-                        "Content-Type":
-                            "application/json"
-                    }
-                }
+        const resultTotal =
+            document.getElementById(
+                "resultTotal"
             );
 
-
-        const resultData =
-            await resultResponse.json();
-
-
-        if (!resultResponse.ok) {
-
-            console.error(
-                "Result API failed:",
-                resultData
+        const resultAnswered =
+            document.getElementById(
+                "resultAnswered"
             );
 
+        const resultUnanswered =
+            document.getElementById(
+                "resultUnanswered"
+            );
 
-            throw new Error(
-                resultData.detail ||
-                "Exam submitted, but the result could not be loaded."
+        if (resultTotal) {
+            resultTotal.textContent =
+                total;
+        }
+
+        if (resultAnswered) {
+            resultAnswered.textContent =
+                answered;
+        }
+
+        if (resultUnanswered) {
+            resultUnanswered.textContent =
+                unanswered;
+        }
+
+        /*
+         * Show the existing result modal.
+         */
+        const resultModal =
+            document.getElementById(
+                "resultModal"
+            );
+
+        if (resultModal) {
+            resultModal.classList.remove(
+                "hidden"
             );
         }
 
-
-        console.log(
-            "FINAL EXAM RESULT:",
-            resultData
-        );
-
-
-        /* =====================================================
-           STEP 6
-           SAVE RESULT FOR REVIEW PAGE
-           ===================================================== */
-
-        localStorage.setItem(
-            "last_exam_result",
-            JSON.stringify(resultData)
-        );
-
-
-        /* =====================================================
-           STEP 7
-           PREVENT ANOTHER SUBMISSION
-           ===================================================== */
-
+        /*
+         * Prevent another submission.
+         */
         studentAttemptId = null;
 
-
-        /* =====================================================
-           STEP 8
-           OPEN RESULT / REVIEW PAGE
-           ===================================================== */
-
-        window.location.href =
-            "review-answer.html";
-
-
-        /* =====================================================
-           AUTO SUBMIT LOG
-           ===================================================== */
-
         if (autoSubmit) {
-
             console.log(
                 "Exam was automatically submitted because the timer expired."
             );
         }
-
 
     } catch (error) {
 
@@ -4106,13 +4067,13 @@ await Promise.all(answerRequests);
             error
         );
 
-
         alert(
             error.message ||
             "Something went wrong while submitting your exam."
         );
     }
 }
+
 
 /* =========================================================
    UPDATE EXAM NAVIGATION
@@ -4351,6 +4312,7 @@ if (confirmSubmitButton) {
         };
 }
 
+
         /* =========================
            LOAD QUESTIONS
            ========================= */
@@ -4359,3 +4321,7 @@ if (confirmSubmitButton) {
 
     }
 );
+
+
+
+

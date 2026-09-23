@@ -510,33 +510,37 @@ body {
 
   <div class="nav-stats">
 
-    <div class="nav-stat">
-      📋 &nbsp; Set No. 01
-    </div>
-
-    <div class="nav-stat">
-      Solved: <b>0</b>
-    </div>
-
-    <div class="nav-stat">
-      Unsolved: <b>40</b>
-    </div>
-
-    <div class="nav-stat total">
-      Total Questions: 40
-    </div>
-
+  <div class="nav-stat">
+    📋 &nbsp; Set No. <b id="setNumber">-</b>
   </div>
+
+  <div class="nav-stat">
+    Solved: <b id="solvedCount">0</b>
+  </div>
+
+  <div class="nav-stat">
+    Unsolved: <b id="unsolvedCount">0</b>
+  </div>
+
+  <div class="nav-stat total">
+    Total Questions: <b id="totalCount">0</b>
+  </div>
+
+</div>
 
 </header>
 
 
 <main class="nav-main">
-  <h1 class="nav-section-title">읽기&nbsp; (20문항)</h1>
-  <div class="nav-grid" id="readingGrid"></div>
+ <h1 class="nav-section-title">
+  읽기&nbsp; (<span id="readingCount">0</span>문항)
+</h1>
+<div class="nav-grid" id="readingGrid"></div>
 
-  <h1 class="nav-section-title">듣기&nbsp; (20문항)</h1>
-  <div class="nav-grid" id="listeningGrid"></div>
+<h1 class="nav-section-title">
+  듣기&nbsp; (<span id="listeningCount">0</span>문항)
+</h1>
+<div class="nav-grid" id="listeningGrid"></div>
 </main>
 
 <button class="nav-back" id="backBtn" >
@@ -598,16 +602,211 @@ body {
   }
 }
 
-loadStudentProfile();
-function makeButton(n){
-  const b=document.createElement("button");
-  b.className="nav-q";
-  b.textContent=n;
-  b.onclick=()=>window.location.href="exam.html?q="+n;
+function makeButton(n) {
+  const b = document.createElement("button");
+
+  b.className = "nav-q";
+  b.textContent = n;
+
+  b.onclick = () => {
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const examId =
+      params.get("exam");
+
+    const setId =
+      params.get("set");
+
+    if (!examId || !setId) {
+      console.error(
+        "Missing examId or setId:",
+        {
+          examId,
+          setId
+        }
+      );
+
+      alert(
+        "Exam information is missing. Please go back and select the test again."
+      );
+
+      return;
+    }
+
+    window.location.href =
+      `exam.html?exam=${encodeURIComponent(examId)}` +
+      `&set=${encodeURIComponent(setId)}` +
+      `&q=${encodeURIComponent(n)}`;
+  };
+
   return b;
 }
-for(let i=1;i<=20;i++) document.getElementById("readingGrid").appendChild(makeButton(i));
-for(let i=21;i<=40;i++) document.getElementById("listeningGrid").appendChild(makeButton(i));
+
+async function loadExamQuestions() {
+  const params = new URLSearchParams(window.location.search);
+
+  const examId = params.get("exam");
+  const setId = params.get("set");
+
+  if (!examId || !setId) {
+    console.error("Missing exam or set ID:", { examId, setId });
+    alert("Exam information is missing. Please select the exam again.");
+    return;
+  }
+
+  try {
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const response = await fetch(
+    `http://127.0.0.1:8000/api/exam-sets/${encodeURIComponent(setId)}/questions`,
+    {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to load questions: ${response.status}`);
+  }
+
+    const questions = await response.json();
+
+    console.log("Loaded questions:", questions);
+
+    const readingGrid = document.getElementById("readingGrid");
+    const listeningGrid = document.getElementById("listeningGrid");
+
+    readingGrid.innerHTML = "";
+    listeningGrid.innerHTML = "";
+
+    /*
+     * Get question type.
+     * The backend may use values such as:
+     * "reading" / "listening"
+     */
+    const readingQuestions = questions.filter(
+  q => String(q.question_type || "").toLowerCase() === "reading"
+);
+
+const listeningQuestions = questions.filter(
+  q => {
+    const type = String(q.question_type || "").toLowerCase();
+
+    return type === "image_audio" || type === "audio_option";
+  }
+);
+    /*
+     * If the backend doesn't provide question_type,
+     * fall back to displaying all questions in reading.
+     */
+    const hasQuestionTypes =
+      readingQuestions.length > 0 || listeningQuestions.length > 0;
+
+    const actualReadingQuestions = hasQuestionTypes
+      ? readingQuestions
+      : questions;
+
+    const actualListeningQuestions = hasQuestionTypes
+      ? listeningQuestions
+      : [];
+
+    // Update statistics
+    document.getElementById("totalCount").textContent = questions.length;
+    document.getElementById("solvedCount").textContent = 0;
+    document.getElementById("unsolvedCount").textContent = questions.length;
+
+    document.getElementById("readingCount").textContent =
+      actualReadingQuestions.length;
+
+    document.getElementById("listeningCount").textContent =
+      actualListeningQuestions.length;
+
+    // Generate Reading buttons
+    actualReadingQuestions.forEach((question, index) => {
+      const questionNumber = index + 1;
+
+      const button = makeButton(questionNumber);
+
+      // Keep the real database question ID
+      button.dataset.questionId = question.id;
+
+      readingGrid.appendChild(button);
+    });
+
+    // Generate Listening buttons
+    actualListeningQuestions.forEach((question, index) => {
+      const questionNumber =
+        actualReadingQuestions.length + index + 1;
+
+      const button = makeButton(questionNumber);
+
+      // Keep the real database question ID
+      button.dataset.questionId = question.id;
+
+      listeningGrid.appendChild(button);
+    });
+
+  } catch (error) {
+    console.error("Error loading exam questions:", error);
+
+    document.getElementById("totalCount").textContent = "0";
+    document.getElementById("unsolvedCount").textContent = "0";
+
+    alert("Unable to load questions. Please try again.");
+  }
+}
+
+async function loadSetInfo() {
+  const params = new URLSearchParams(window.location.search);
+
+  const examId = params.get("exam");
+  const setId = params.get("set");
+
+  if (!examId || !setId) return;
+
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/quizzes/"
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to load quiz information: ${response.status}`);
+    }
+
+    const exams = await response.json();
+
+    const exam = exams.find(
+      e => String(e.id) === String(examId)
+    );
+
+    if (!exam) {
+      throw new Error("Exam not found");
+    }
+
+    const selectedSet = (exam.sets || []).find(
+      s => String(s.id) === String(setId)
+    );
+
+    if (!selectedSet) {
+      throw new Error("Set not found");
+    }
+
+    document.getElementById("setNumber").textContent =
+      String(selectedSet.set_number).padStart(2, "0");
+
+  } catch (error) {
+    console.error("Error loading set information:", error);
+  }
+}
 
 document.getElementById("backBtn").onclick=()=>window.location.href="../index.html";
 document.getElementById("submitBtn").onclick=()=>alert("Please select a question to start the exam.");
@@ -618,6 +817,11 @@ if (backBtn) {
     window.location.href = "set.html";
   });
 }
+
+loadStudentProfile();
+loadSetInfo();
+loadExamQuestions();
+
 </script>
 </body>
 </html>

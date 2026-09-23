@@ -1179,3 +1179,1756 @@ button {
     min-height: 120px;
   }
 }
+/* Selected answer */
+.exam-option.selected {
+    background: #dbeafe;
+    border: 2px solid #2563eb;
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Make options feel clickable */
+.exam-option {
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.exam-option:hover {
+    border-color: #2563eb;
+}
+
+/* =========================================
+   ALL QUESTIONS MODAL
+========================================= */
+
+.all-questions-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+}
+
+.all-questions-modal.hidden {
+    display: none;
+}
+
+.all-questions-box {
+    width: min(700px, 100%);
+    max-height: 85vh;
+
+    background: #ffffff;
+    border-radius: 18px;
+
+    padding: 24px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+    overflow-y: auto;
+}
+
+.all-questions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 6px;
+}
+
+.all-questions-header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.close-all-btn {
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f5f9;
+
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.all-questions-subtitle {
+    margin: 0 0 20px;
+    color: #64748b;
+}
+
+.all-questions-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.all-question-number {
+    height: 48px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.all-question-number:hover {
+    transform: translateY(-2px);
+}
+
+.all-question-number.current {
+    border: 2px solid #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.all-question-number.answered {
+    background: #dcfce7;
+    border-color: #22c55e;
+    color: #166534;
+}
+
+.all-question-number.current.answered {
+    background: #dbeafe;
+    border: 2px solid #2563eb;
+    color: #1d4ed8;
+}
+
+.all-questions-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+
+    margin-top: 24px;
+
+    font-size: 13px;
+    color: #475569;
+}
+
+.all-questions-legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-box {
+    width: 14px;
+    height: 14px;
+
+    display: inline-block;
+
+    border-radius: 4px;
+
+    background: #f8fafc;
+    border: 1px solid #dbe2ea;
+}
+
+.legend-box.current {
+    background: #eff6ff;
+    border: 2px solid #2563eb;
+}
+
+.legend-box.answered {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+
+.legend-box.unanswered {
+    background: #f8fafc;
+    border-color: #dbe2ea;
+}
+
+@media (max-width: 600px) {
+    .all-questions-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .all-questions-box {
+        padding: 18px;
+    }
+}
+
+/* =========================================================
+   EPS TOPIK EXAM PAGE - REFERENCE DESIGN
+   Visual changes only
+   Backend / API / JS functionality is NOT changed
+   ========================================================= */
+
+
+/* =========================
+   EXAM PAGE BACKGROUND
+   ========================= */
+
+body:has(#options) {
+    margin: 0;
+    min-height: 100vh;
+    background: #f4f7ff;
+    color: #14213d;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+
+/* Decorative circles */
+
+body:has(#options)::before,
+body:has(#options)::after {
+    content: "";
+    position: fixed;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: rgba(47, 100, 235, 0.07);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body:has(#options)::before {
+    top: 80px;
+    left: -55px;
+}
+
+body:has(#options)::after {
+    top: 110px;
+    right: -35px;
+}
+
+
+/* Keep exam content above decorations */
+
+body:has(#options) > * {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+body:has(#options) .topbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e4eaf5;
+    box-shadow: 0 2px 10px rgba(30, 64, 120, 0.04);
+    padding: 14px 34px;
+}
+
+
+/* Logo */
+
+body:has(#options) .logo {
+    color: #172b4d;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+
+/* Stats container */
+
+body:has(#options) .stats {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+
+/* Individual stat cards */
+
+body:has(#options) .stat-card,
+body:has(#options) .stat {
+    background: #ffffff;
+    border: 1px solid #dfe7f5;
+    border-radius: 10px;
+    padding: 9px 20px;
+    min-width: 110px;
+    text-align: center;
+    box-shadow: 0 3px 12px rgba(36, 74, 135, 0.04);
+}
+
+
+/* =========================================================
+   SECTION BAR
+   ========================================================= */
+
+body:has(#options) .section-bar {
+    position: relative;
+    width: 100%;
+    min-height: 43px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #2864e8;
+    color: #ffffff;
+
+    box-shadow: 0 4px 12px rgba(40, 100, 232, 0.18);
+}
+
+
+/* Section title */
+
+body:has(#options) #sectionName {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+
+/* Section total badge */
+
+body:has(#options) #sectionTotal {
+    position: absolute;
+    right: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 43px;
+    min-width: 124px;
+
+    padding: 0 15px;
+
+    background: #2058d1;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    border-radius: 0 0 7px 7px;
+}
+
+
+/* =========================================================
+   MAIN QUESTION AREA
+   ========================================================= */
+
+body:has(#options) .question-area {
+    width: min(780px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 37px 0 24px;
+}
+
+
+/* =========================================================
+   QUESTION HEADER
+   ========================================================= */
+
+body:has(#options) .question-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+    padding: 0;
+}
+
+
+/* Question number */
+
+body:has(#options) #qTitle {
+    margin: 0;
+
+    font-size: 25px;
+    font-weight: 800;
+    color: #172b4d;
+}
+
+
+/* Question group/type */
+
+body:has(#options) #group {
+    display: none;
+}
+
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+body:has(#options) .timer-box {
+    min-width: 86px;
+    padding: 8px 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #dce5f4;
+    border-radius: 10px;
+
+    text-align: center;
+
+    box-shadow: 0 4px 14px rgba(45, 83, 145, 0.08);
+}
+
+
+body:has(#options) .timer-box::before {
+    content: "TIME LEFT";
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #8995aa;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+
+body:has(#options) #timer {
+    display: block;
+
+    color: #2864e8;
+
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   QUESTION CARD
+   ========================================================= */
+
+body:has(#options) .question-panel {
+    width: 100%;
+    min-height: 320px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #e0e7f3;
+    border-radius: 13px;
+
+    padding: 38px 20px;
+
+    box-shadow:
+        0 10px 30px rgba(45, 82, 145, 0.08);
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Question prompt */
+
+body:has(#options) #prompt {
+    margin: 0 0 20px;
+
+    color: #172b4d;
+
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   MEDIA + ANSWERS TWO-COLUMN LAYOUT
+   ========================================================= */
+
+body:has(#options) .content-row {
+    display: grid;
+
+    grid-template-columns: 353px minmax(0, 1fr);
+
+    gap: 20px;
+
+    width: 100%;
+    flex: 1;
+}
+
+
+/* =========================================================
+   MEDIA PANEL
+   ========================================================= */
+
+body:has(#options) #mediaPanel {
+    min-height: 260px;
+
+    box-sizing: border-box;
+
+    background: #f8faff;
+
+    border: 1px solid #dbe5f4;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+/* Media text */
+
+body:has(#options) #mediaText {
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+/* Image */
+
+body:has(#options) #mediaImage {
+    max-width: 100%;
+    max-height: 250px;
+
+    object-fit: contain;
+
+    border-radius: 7px;
+}
+
+
+/* Hide media when JS applies hidden */
+
+body:has(#options) #mediaImage.hidden,
+body:has(#options) #audioPlaceholder.hidden {
+    display: none;
+}
+
+
+/* =========================================================
+   AUDIO
+   ========================================================= */
+
+body:has(#options) #audioPlaceholder {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ANSWERS
+   ========================================================= */
+
+body:has(#options) #options {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+
+    justify-content: flex-start;
+}
+
+
+/* Dynamic answer buttons */
+
+body:has(#options) .exam-option {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 11px 15px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border: 1px solid #dce5f2;
+    border-radius: 9px;
+
+    color: #243b5a;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+
+body:has(#options) .exam-option:hover {
+    background: #f4f7ff;
+    border-color: #8eaff5;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 12px rgba(40, 100, 232, 0.08);
+}
+
+
+/* Answer label */
+
+body:has(#options) .option-label {
+    width: 30px;
+    height: 30px;
+
+    flex: 0 0 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 11px;
+
+    background: #eef3ff;
+
+    border-radius: 50%;
+
+    color: #2864e8;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* Answer text */
+
+body:has(#options) .option-text {
+    line-height: 1.4;
+}
+
+
+/* Selected answer */
+
+body:has(#options) .exam-option.selected {
+    background: #edf3ff;
+
+    border-color: #2864e8;
+
+    box-shadow:
+        0 0 0 1px rgba(40, 100, 232, 0.08);
+}
+
+
+body:has(#options) .exam-option.selected .option-label {
+    background: #2864e8;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   NAVIGATION BUTTONS
+   ========================================================= */
+
+body:has(#options) .exam-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 28px;
+
+    margin-top: 24px;
+}
+
+
+/* Previous / View All / Next */
+
+body:has(#options) #prevBtn,
+body:has(#options) #allBtn,
+body:has(#options) #nextBtn {
+    height: 39px;
+
+    padding: 0 23px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #2864e8;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 13px rgba(40, 100, 232, 0.22);
+
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+
+body:has(#options) #prevBtn:hover,
+body:has(#options) #allBtn:hover,
+body:has(#options) #nextBtn:hover {
+    background: #1f58d2;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 17px rgba(40, 100, 232, 0.28);
+}
+
+
+/* Disabled Previous */
+
+body:has(#options) #prevBtn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    transform: none;
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+body:has(#options) #submitModal,
+body:has(#options) #resultModal,
+body:has(#options) #allQuestionsModal {
+    z-index: 9999;
+}
+
+
+/* =========================================================
+   ALL QUESTIONS MODAL
+   ========================================================= */
+
+body:has(#options) #allQuestionsGrid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+
+    gap: 10px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    body:has(#options) .question-area {
+        width: calc(100% - 28px);
+        padding-top: 25px;
+    }
+
+    body:has(#options) .content-row {
+        grid-template-columns: 1fr;
+    }
+
+    body:has(#options) #mediaPanel {
+        min-height: 220px;
+    }
+
+    body:has(#options) .stats {
+        gap: 6px;
+    }
+
+    body:has(#options) .stat-card,
+    body:has(#options) .stat {
+        min-width: 75px;
+        padding: 8px 9px;
+    }
+
+    body:has(#options) #sectionTotal {
+        right: 15px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    body:has(#options) .topbar {
+        padding: 12px 15px;
+    }
+
+    body:has(#options) .logo {
+        font-size: 16px;
+    }
+
+    body:has(#options) .stats {
+        display: none;
+    }
+
+    body:has(#options) .section-bar {
+        min-height: 48px;
+    }
+
+    body:has(#options) #sectionName {
+        font-size: 17px;
+    }
+
+    body:has(#options) #sectionTotal {
+        min-width: 100px;
+        height: 48px;
+
+        right: 0;
+
+        font-size: 10px;
+    }
+
+    body:has(#options) .question-head {
+        align-items: flex-start;
+    }
+
+    body:has(#options) #qTitle {
+        font-size: 22px;
+    }
+
+    body:has(#options) .question-panel {
+        padding: 20px 14px;
+    }
+
+    body:has(#options) .exam-controls {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    body:has(#options) #prevBtn,
+    body:has(#options) #allBtn,
+    body:has(#options) #nextBtn {
+        padding: 0 14px;
+    }
+}
+
+/* =========================================================
+   EXAM REFERENCE LAYOUT - FINAL OVERRIDE
+   Fixes conflicts with the original exam CSS
+   ========================================================= */
+
+
+/* =========================================================
+   SECTION BAR
+   ========================================================= */
+
+body:has(#options) .section-bar {
+    position: relative !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    height: 43px !important;
+    min-height: 43px !important;
+
+    padding: 0 !important;
+
+    background: #2864e8 !important;
+    color: #ffffff !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Force section title to be visible */
+
+body:has(#options) #sectionName {
+    display: block !important;
+    visibility: visible !important;
+
+    position: static !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #ffffff !important;
+
+    font-size: 19px !important;
+    font-weight: 800 !important;
+
+    line-height: 43px !important;
+}
+
+
+/* Section total */
+
+body:has(#options) #sectionTotal {
+    display: flex !important;
+    visibility: visible !important;
+
+    position: absolute !important;
+
+    top: 0 !important;
+    right: 40px !important;
+
+    width: auto !important;
+    min-width: 124px !important;
+    height: 43px !important;
+
+    margin: 0 !important;
+    padding: 0 16px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    background: #2058d1 !important;
+    color: #ffffff !important;
+
+    border-radius: 0 0 7px 7px !important;
+
+    font-size: 11px !important;
+    font-weight: 700 !important;
+
+    transform: none !important;
+}
+
+
+/* =========================================================
+   MAIN EXAM AREA
+   ========================================================= */
+
+body:has(#options) .question-area {
+    width: min(768px, calc(100% - 40px)) !important;
+
+    max-width: 768px !important;
+
+    margin: 0 auto !important;
+
+    padding: 38px 0 24px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   QUESTION HEADER
+   ========================================================= */
+
+body:has(#options) .question-head {
+    width: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    margin: 0 0 15px !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Question number */
+
+body:has(#options) #qTitle {
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #172b4d !important;
+
+    font-size: 25px !important;
+    font-weight: 800 !important;
+
+    line-height: 1.2 !important;
+}
+
+
+/* Hide question type */
+
+body:has(#options) #group {
+    display: none !important;
+}
+
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+body:has(#options) .timer-box {
+    position: relative !important;
+
+    display: block !important;
+
+    width: 86px !important;
+    min-width: 86px !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 8px 12px !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dce5f4 !important;
+    border-radius: 10px !important;
+
+    text-align: center !important;
+
+    box-shadow: 0 4px 14px rgba(45, 83, 145, 0.08) !important;
+}
+
+
+/* Remove any old timer label */
+
+body:has(#options) .timer-box::before {
+    content: "TIME LEFT" !important;
+
+    display: block !important;
+
+    position: static !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    margin: 0 0 3px !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+
+    color: #8995aa !important;
+
+    font-size: 8px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+}
+
+
+/* Timer */
+
+body:has(#options) #timer {
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #2864e8 !important;
+
+    font-size: 17px !important;
+    font-weight: 800 !important;
+
+    line-height: 1.2 !important;
+}
+
+
+/* =========================================================
+   QUESTION PANEL
+   ========================================================= */
+
+body:has(#options) .question-panel {
+    display: flex !important;
+    flex-direction: column !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    min-height: 320px !important;
+
+    margin: 0 !important;
+    padding: 38px 20px !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #e0e7f3 !important;
+    border-radius: 13px !important;
+
+    box-shadow:
+        0 10px 30px rgba(45, 82, 145, 0.08) !important;
+}
+
+
+/* =========================================================
+   QUESTION PROMPT
+   ========================================================= */
+
+body:has(#options) #prompt {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 20px !important;
+    padding: 0 !important;
+
+    color: #172b4d !important;
+
+    font-size: 18px !important;
+    font-weight: 600 !important;
+
+    line-height: 1.55 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   CONTENT ROW
+   ========================================================= */
+
+body:has(#options) .content-row {
+    display: grid !important;
+
+    grid-template-columns: 353px minmax(0, 1fr) !important;
+
+    gap: 20px !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    flex: 1 1 auto !important;
+}
+
+
+/* =========================================================
+   MEDIA PANEL
+   ========================================================= */
+
+body:has(#options) #mediaPanel {
+    display: flex !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 260px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #f8faff !important;
+
+    border: 1px solid #dbe5f4 !important;
+    border-radius: 10px !important;
+
+    overflow: hidden !important;
+}
+
+
+/* =========================================================
+   OPTIONS CONTAINER
+   ========================================================= */
+
+body:has(#options) #options {
+    display: flex !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+
+    gap: 11px !important;
+}
+
+
+/* =========================================================
+   ANSWER BUTTONS
+   ========================================================= */
+
+body:has(#options) .exam-option {
+    display: flex !important;
+
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+
+    min-height: 48px !important;
+
+    margin: 0 !important;
+    padding: 9px 13px !important;
+
+    box-sizing: border-box !important;
+
+    align-items: center !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dce5f2 !important;
+    border-radius: 9px !important;
+
+    color: #243b5a !important;
+
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+
+    text-align: left !important;
+
+    cursor: pointer !important;
+}
+
+
+/* Answer label */
+
+body:has(#options) .exam-option .option-label {
+    display: flex !important;
+
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+
+    margin: 0 11px 0 0 !important;
+    padding: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 50% !important;
+
+    background: #eef3ff !important;
+    color: #2864e8 !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+}
+
+
+/* Answer text */
+
+body:has(#options) .exam-option .option-text {
+    display: block !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.4 !important;
+}
+
+
+/* Selected */
+
+body:has(#options) .exam-option.selected {
+    background: #edf3ff !important;
+
+    border-color: #2864e8 !important;
+
+    box-shadow:
+        0 0 0 1px rgba(40, 100, 232, 0.08) !important;
+}
+
+
+body:has(#options) .exam-option.selected .option-label {
+    background: #2864e8 !important;
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+body:has(#options) .exam-controls {
+    display: flex !important;
+
+    width: 100% !important;
+
+    margin: 24px 0 0 !important;
+    padding: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 28px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Buttons */
+
+body:has(#options) .exam-controls button,
+body:has(#options) #prevBtn,
+body:has(#options) #allBtn,
+body:has(#options) #nextBtn {
+    position: static !important;
+
+    display: inline-flex !important;
+
+    width: auto !important;
+    min-width: 115px !important;
+    height: 39px !important;
+
+    margin: 0 !important;
+    padding: 0 20px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+
+    background: #2864e8 !important;
+    color: #ffffff !important;
+
+    border: none !important;
+    border-radius: 9px !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+
+    cursor: pointer !important;
+
+    box-shadow:
+        0 5px 13px rgba(40, 100, 232, 0.22) !important;
+}
+
+
+/* Previous disabled */
+
+body:has(#options) #prevBtn:disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+}
+
+
+/* =========================================================
+   REMOVE OLD POSITIONING THAT CAUSES OVERLAP
+   ========================================================= */
+
+body:has(#options) .question-area *,
+body:has(#options) .question-panel *,
+body:has(#options) .content-row * {
+    float: none;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    body:has(#options) .question-area {
+        width: calc(100% - 30px) !important;
+        max-width: none !important;
+    }
+
+    body:has(#options) .content-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    body:has(#options) #mediaPanel {
+        min-height: 220px !important;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    body:has(#options) .question-area {
+        width: calc(100% - 20px) !important;
+    }
+
+    body:has(#options) .section-bar {
+        height: 48px !important;
+    }
+
+    body:has(#options) #sectionName {
+        font-size: 17px !important;
+    }
+
+    body:has(#options) #sectionTotal {
+        right: 0 !important;
+        min-width: 105px !important;
+    }
+
+    body:has(#options) .exam-controls {
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+    }
+}
+
+/* =========================================================
+   EPS TOPIK EXAM — FINAL VISUAL POLISH
+   Structure/function unchanged
+   ========================================================= */
+
+
+/* =========================
+   HEADER — slightly shorter
+   ========================= */
+
+body:has(#options) .topbar {
+    min-height: 108px !important;
+    padding: 18px 32px !important;
+    box-sizing: border-box !important;
+}
+
+body:has(#options) .logo {
+    font-size: 20px !important;
+}
+
+
+/* =========================
+   STAT CARDS
+   ========================= */
+
+body:has(#options) .stats {
+    gap: 10px !important;
+}
+
+body:has(#options) .stats > div {
+    min-width: 90px !important;
+    padding: 9px 16px !important;
+
+    border: 1px solid #dbe5f4 !important;
+    border-radius: 9px !important;
+
+    background: #ffffff !important;
+
+    color: #64748b !important;
+
+    font-size: 12px !important;
+}
+
+body:has(#options) .stats > div b {
+    color: #172b4d !important;
+}
+
+
+/* =========================
+   BLUE SECTION BAR
+   ========================= */
+
+body:has(#options) .section-bar {
+    height: 42px !important;
+    min-height: 42px !important;
+}
+
+body:has(#options) #sectionName {
+    font-size: 18px !important;
+    line-height: 42px !important;
+}
+
+body:has(#options) #sectionTotal {
+    height: 42px !important;
+    min-width: 124px !important;
+    right: 40px !important;
+}
+
+
+/* =========================
+   MAIN EXAM AREA
+   ========================= */
+
+body:has(#options) .question-area {
+    width: 100% !important;
+    max-width: none !important;
+
+    padding: 25px 20px 35px !important;
+}
+
+
+/* =========================
+   QUESTION HEADER
+   ========================= */
+
+body:has(#options) .question-head {
+    width: min(768px, 100%) !important;
+
+    margin-bottom: 14px !important;
+}
+
+body:has(#options) #qTitle {
+    font-size: 24px !important;
+}
+
+
+/* =========================
+   TIMER
+   ========================= */
+
+body:has(#options) .timer-box {
+    width: 86px !important;
+    min-width: 86px !important;
+
+    padding: 8px 11px !important;
+
+    border-radius: 10px !important;
+}
+
+body:has(#options) .timer-box span {
+    display: block !important;
+
+    color: #8995aa !important;
+
+    font-size: 8px !important;
+    font-weight: 800 !important;
+
+    letter-spacing: 1px !important;
+}
+
+body:has(#options) #timer {
+    font-size: 17px !important;
+}
+
+
+/* =========================
+   QUESTION CARD
+   ========================= */
+
+body:has(#options) .question-panel {
+    width: min(768px, 100%) !important;
+    max-width: 768px !important;
+
+    min-height: 0 !important;
+
+    padding: 30px 20px !important;
+
+    border-radius: 13px !important;
+}
+
+
+/* =========================
+   QUESTION TEXT
+   ========================= */
+
+body:has(#options) #prompt {
+    margin-bottom: 17px !important;
+
+    font-size: 17px !important;
+}
+
+
+/* =========================
+   MEDIA + ANSWERS
+   ========================= */
+
+body:has(#options) .question-panel .content-row {
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr) !important;
+
+    gap: 20px !important;
+}
+
+
+/* =========================
+   MEDIA PANEL
+   ========================= */
+
+body:has(#options) #mediaPanel {
+    min-height: 250px !important;
+
+    border-radius: 9px !important;
+}
+
+
+/* =========================
+   ANSWERS
+   ========================= */
+
+body:has(#options) #options {
+    gap: 10px !important;
+}
+
+body:has(#options) .exam-option {
+    min-height: 46px !important;
+
+    padding: 8px 13px !important;
+
+    border-radius: 8px !important;
+
+    font-size: 13px !important;
+}
+
+body:has(#options) .exam-option .option-label {
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+
+    margin-right: 10px !important;
+
+    font-size: 12px !important;
+}
+
+
+/* =========================
+   NAVIGATION
+   ========================= */
+
+body:has(#options) .controls {
+    width: min(768px, 100%) !important;
+
+    margin-top: 22px !important;
+
+    gap: 28px !important;
+}
+
+body:has(#options) .controls button {
+    height: 39px !important;
+
+    min-width: 115px !important;
+
+    padding: 0 19px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 12px !important;
+}
+
+
+/* =========================
+   DECORATIVE CIRCLES
+   ========================= */
+
+body:has(#options)::before {
+    width: 170px !important;
+    height: 170px !important;
+
+    top: 75px !important;
+    left: -65px !important;
+}
+
+body:has(#options)::after {
+    width: 170px !important;
+    height: 170px !important;
+
+    top: 110px !important;
+    right: -55px !important;
+}
+
+
+/* =========================
+   DESKTOP ALIGNMENT
+   ========================= */
+
+@media (min-width: 1000px) {
+
+    body:has(#options) .question-head {
+        width: 768px !important;
+    }
+
+    body:has(#options) .question-panel {
+        width: 768px !important;
+    }
+
+    body:has(#options) .controls {
+        width: 768px !important;
+    }
+}
+
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 850px) {
+
+    body:has(#options) .topbar {
+        min-height: auto !important;
+    }
+
+    body:has(#options) .question-panel {
+        width: 100% !important;
+    }
+
+    body:has(#options) .question-panel .content-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    body:has(#options) #mediaPanel {
+        min-height: 210px !important;
+    }
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 600px) {
+
+    body:has(#options) .topbar {
+        padding: 14px 15px !important;
+    }
+
+    body:has(#options) .stats {
+        display: none !important;
+    }
+
+    body:has(#options) .question-area {
+        padding: 20px 10px 30px !important;
+    }
+
+    body:has(#options) .question-panel {
+        padding: 20px 14px !important;
+    }
+
+    body:has(#options) .controls {
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+    }
+
+    body:has(#options) .controls button {
+        min-width: 100px !important;
+    }
+}
+
+/* =========================================================
+   FINAL CENTERING FIX
+   ========================================================= */
+
+body:has(#options) .question-head {
+    width: min(768px, 100%) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+body:has(#options) .question-panel {
+    width: min(768px, 100%) !important;
+    max-width: 768px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+body:has(#options) .controls {
+    width: min(768px, 100%) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
