@@ -975,53 +975,130 @@ async function loadQuizData() {
         categories = [];
         setsByCategory = {};
 
+        /*
+         * Group exams by chapter name.
+         *
+         * Since the Admin Create Quiz page now uses
+         * the selected chapter as quiz.title, exams
+         * with the same title belong to the same chapter.
+         */
+        const groupedChapters = {};
+
         exams.forEach((exam) => {
-            const categoryId = String(exam.id);
 
-            const category = {
-                id: categoryId,
-                name: exam.title,
-                title: exam.title
-            };
+            const chapterName =
+                String(exam.title || "").trim();
 
-            categories.push(category);
+            if (!chapterName) {
+                return;
+            }
 
-            setsByCategory[categoryId] = (exam.sets || []).map((set) => ({
-                id: String(set.id),
-                exam_id: String(set.exam_id ?? exam.id),
-                set_number: Number(set.set_number),
-                set_name: set.set_name || `Set ${set.set_number}`
-            }));
+            /*
+             * Create a safe ID for the chapter.
+             */
+            const categoryId =
+                chapterName
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-|-$/g, "");
+
+            /*
+             * Create chapter if it doesn't exist.
+             */
+            if (!groupedChapters[categoryId]) {
+
+                groupedChapters[categoryId] = {
+                    id: categoryId,
+                    name: chapterName,
+                    title: chapterName
+                };
+
+                setsByCategory[categoryId] = [];
+            }
+
+            /*
+             * Add every set belonging to this exam
+             * into the chapter.
+             */
+            (exam.sets || []).forEach((set) => {
+
+                setsByCategory[categoryId].push({
+                    id: String(set.id),
+
+                    exam_id:
+                        String(
+                            set.exam_id ?? exam.id
+                        ),
+
+                    set_number:
+                        Number(
+                            set.set_number
+                        ),
+
+                    set_name:
+                        set.set_name ||
+                        `Set ${set.set_number}`
+                });
+
+            });
         });
+
+        /*
+         * Convert grouped chapters into the
+         * categories array used by the UI.
+         */
+        categories =
+            Object.values(groupedChapters);
+
+        /*
+         * Sort sets numerically.
+         */
+        Object.keys(setsByCategory).forEach(
+            (categoryId) => {
+
+                setsByCategory[categoryId].sort(
+                    (a, b) =>
+                        a.set_number -
+                        b.set_number
+                );
+
+            }
+        );
+
+        console.log(
+            "Loaded chapters:",
+            categories
+        );
+
+        console.log(
+            "Sets grouped by chapter:",
+            setsByCategory
+        );
 
         renderCategories();
 
-        if (categories.length > 0) {
-    const firstCategoryButton =
-        document.querySelector(".category-btn");
-
-    if (firstCategoryButton) {
-        firstCategoryButton.click();
-    }
-}
-
     } catch (error) {
-        console.error("Failed to load quizzes:", error);
+
+        console.error(
+            "Failed to load quizzes:",
+            error
+        );
 
         const categoryContainer =
             document.getElementById("categoryList") ||
             document.getElementById("categories");
 
         if (categoryContainer) {
+
             categoryContainer.innerHTML = `
                 <p style="color: red;">
-                    Unable to load quizzes. Please check whether the backend is running.
+                    Unable to load quizzes.
+                    Please check whether the backend is running.
                 </p>
             `;
         }
     }
 }
-
     /* =========================================================
    LOGIN PROTECTION
    ========================================================= */

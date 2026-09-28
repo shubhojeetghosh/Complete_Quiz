@@ -2905,6 +2905,15 @@ if (viewResultModal) {
                 quiz.questions?.length ??
                 0;
 
+            const setNumber =
+                quiz.set_number ??
+                quiz.setNumber ??
+                quiz.exam_set?.set_number ??
+                quiz.set?.set_number ??
+                (Array.isArray(quiz.sets) && quiz.sets.length > 0
+                    ? quiz.sets[0].set_number
+                    : null);
+
 
             const status =
                 String(
@@ -2923,56 +2932,64 @@ if (viewResultModal) {
 
             row.innerHTML = `
 
-                <td>
-                    ${title}
-                </td>
+    <td>
+        ${title}
+    </td>
 
-                <td>
-                    ${questionsCount}
-                </td>
+    <td>
+        ${
+            setNumber !== null &&
+            setNumber !== undefined
+                ? `Set ${String(setNumber).padStart(2, "0")}`
+                : "—"
+        }
+    </td>
 
-                <td>
+    <td>
+        ${questionsCount}
+    </td>
 
-                    <span
-                        class="status ${status.toLowerCase()}-status"
-                    >
-                        ${status}
-                    </span>
+    <td>
 
-                </td>
+        <span
+            class="status ${status.toLowerCase()}-status"
+        >
+            ${status}
+        </span>
 
-                <td>
-                    ${created}
-                </td>
+    </td>
 
-                <td>
+    <td>
+        ${created}
+    </td>
 
-                    <div class="table-actions">
+    <td>
 
-                        <button
-                            class="table-action view-quiz-btn"
-                            data-quiz-id="${quiz.id}">
-                            View
-                        </button>
+        <div class="table-actions">
 
-                        <button
-                            class="table-action edit-quiz-btn"
-                            data-quiz-id="${quiz.id}">
-                            Edit
-                        </button>
+            <button
+                class="table-action view-quiz-btn"
+                data-quiz-id="${quiz.id}">
+                View
+            </button>
 
-                        <button
-                            class="table-action delete-quiz-btn"
-                            data-quiz-id="${quiz.id}">
-                            Delete
-                        </button>
+            <button
+                class="table-action edit-quiz-btn"
+                data-quiz-id="${quiz.id}">
+                Edit
+            </button>
 
-                    </div>
+            <button
+                class="table-action delete-quiz-btn"
+                data-quiz-id="${quiz.id}">
+                Delete
+            </button>
 
-                </td>
+        </div>
 
-            `;
+    </td>
 
+`;
 
             quizzesTable.appendChild(row);
 

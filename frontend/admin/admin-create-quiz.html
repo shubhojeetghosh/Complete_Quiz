@@ -42,6 +42,31 @@
   margin-top: 24px;
   padding-bottom: 8px;
 }
+
+.admin-field select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-field select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.admin-field select option {
+  color: #333333;
+  background-color: #ffffff;
+}
+
   </style>
 </head>
 
@@ -259,23 +284,57 @@
 
         <div class="admin-form-grid">
 
-          <!-- TEST NAME -->
+          <!-- CHAPTER -->
 
-          <div class="admin-field admin-field-wide">
+<div class="admin-field admin-field-wide">
 
-            <label for="quizTitle">
-              Test Name
-            </label>
+  <label for="quizTitle">
+    Chapter
+  </label>
 
-            <input
-              type="text"
-              id="quizTitle"
-              placeholder="Example: EPS TOPIK Practice Test 01"
-              required
-            >
+  <select
+    id="quizTitle"
+    required
+  >
+    <option value="" selected disabled>
+      Select a chapter
+    </option>
 
-          </div>
+    <option value="Korean Vowels & Consonants">
+      Korean Vowels & Consonants
+    </option>
 
+    <option value="Korean Numbers">
+      Korean Numbers
+    </option>
+
+    <option value="Counting Units">
+      Counting Units
+    </option>
+
+    <option value="Parts of Speech">
+      Parts of Speech
+    </option>
+
+    <option value="Tense">
+      Tense
+    </option>
+
+    <option value="Formal & Informal Language">
+      Formal & Informal Language
+    </option>
+
+    <option value="Indirect Speech">
+      Indirect Speech
+    </option>
+
+    <option value="EPS TOPIK TEXT BOOK">
+      EPS TOPIK TEXT BOOK
+    </option>
+
+  </select>
+
+</div>
 
           <!-- SET NUMBER -->
 
@@ -677,15 +736,14 @@ async function loadQuizForEditing() {
   }
 
   const API_BASE_URL =
-    (
-      window.location.hostname ===
-      "localhost" ||
-
-      window.location.hostname ===
-      "127.0.0.1"
-    )
-      ? "http://127.0.0.1:8000"
-      : "http://10.60.227.210:8000";
+    window.EPS_API?.baseUrl
+        ? window.EPS_API.baseUrl
+        : (
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+        )
+            ? "http://127.0.0.1:8000"
+            : "http://10.60.227.210:8000";
 
   try {
 
@@ -775,178 +833,6 @@ async function loadQuizForEditing() {
   }
 
 }
-
-
-      /* =====================================================
-         LOAD QUIZ INFORMATION
-         ===================================================== */
-
-      document.getElementById(
-        "quizTitle"
-      ).value =
-        editingQuiz.title || "";
-
-
-      document.getElementById(
-        "quizSetNumber"
-      ).value =
-        editingQuiz.set_number || "";
-
-
-      document.getElementById(
-        "quizDuration"
-      ).value =
-        editingQuiz.duration || "";
-
-
-      document.getElementById(
-        "quizTotalMarks"
-      ).value =
-        editingQuiz.total_marks || "";
-
-
-      document.getElementById(
-        "quizPassMarks"
-      ).value =
-        editingQuiz.pass_marks || "";
-
-
-      document.getElementById(
-        "quizDescription"
-      ).value =
-        editingQuiz.description || "";
-
-
-      /* =====================================================
-         LOAD SETTINGS
-         ===================================================== */
-
-      if (editingQuiz.settings) {
-
-        document.getElementById(
-          "showResults"
-        ).checked =
-          !!editingQuiz.settings.show_results;
-
-
-        document.getElementById(
-          "allowRetake"
-        ).checked =
-          !!editingQuiz.settings.allow_retake;
-
-
-        document.getElementById(
-          "subscriptionRequired"
-        ).checked =
-          !!editingQuiz.settings.subscription_required;
-
-      }
-
-
-      /* =====================================================
-         CLEAR EXISTING QUESTIONS
-         ===================================================== */
-
-      const container =
-        document.getElementById(
-          "questionContainer"
-        );
-
-
-      container.innerHTML = "";
-
-
-      questionCount = 0;
-
-
-      /* =====================================================
-         RECREATE QUESTIONS
-         ===================================================== */
-
-      if (
-        Array.isArray(
-          editingQuiz.questions
-        )
-      ) {
-
-        editingQuiz.questions.forEach(
-          function (savedQuestion) {
-
-            addQuestion();
-
-
-            const cards =
-              document.querySelectorAll(
-                ".admin-question-card"
-              );
-
-
-            const card =
-              cards[cards.length - 1];
-
-
-            card.querySelector(
-              ".question-section"
-            ).value =
-              savedQuestion.section || "reading";
-
-
-            card.querySelector(
-              ".question-marks"
-            ).value =
-              savedQuestion.marks || 5;
-
-
-            card.querySelector(
-              ".question-text"
-            ).value =
-              savedQuestion.question || "";
-
-
-            card.querySelector(
-              ".option-a"
-            ).value =
-              savedQuestion.options?.A || "";
-
-
-            card.querySelector(
-              ".option-b"
-            ).value =
-              savedQuestion.options?.B || "";
-
-
-            card.querySelector(
-              ".option-c"
-            ).value =
-              savedQuestion.options?.C || "";
-
-
-            card.querySelector(
-              ".option-d"
-            ).value =
-              savedQuestion.options?.D || "";
-
-
-            card.querySelector(
-              ".correct-answer"
-            ).value =
-              savedQuestion.correct_answer || "";
-
-
-            handleQuestionType(
-              card.querySelector(
-                ".question-section"
-              )
-            );
-
-          }
-        );
-
-      }
-
-
-      updateQuestionStats();
-
     
 
 
@@ -1764,14 +1650,12 @@ question.scrollIntoView({
 
       if (!quiz.title) {
 
-        alert(
-          "Please enter the test name."
-        );
+  alert(
+    "Please select a chapter."
+  );
 
-        return false;
-
-      }
-
+  return false;
+}
 
       if (!quiz.set_number) {
 
@@ -2720,139 +2604,431 @@ quiz.status =
     }
 
 
-    /* =========================================================
-       ADMIN SESSION
-       ========================================================= */
 
-   function loadAdminProfile() {
+/* =========================================================
+   ADMIN SESSION / PROFILE
+   ========================================================= */
 
-    /* =====================================================
-       GET ADMIN SESSION
-    ===================================================== */
+async function loadAdminProfile() {
 
-    const token =
-        localStorage.getItem("admin_access_token");
+    console.log("=== LOAD ADMIN PROFILE ===");
+
+    const token = localStorage.getItem("admin_access_token");
+
+    console.log("Admin token exists:", !!token);
 
     if (!token) {
+        console.error("No admin_access_token found.");
 
-        alert(
-            "Your admin session has expired. Please login again."
-        );
-
-        window.location.href =
-            "ad-login.html";
-
+        window.location.href = "ad-login.html";
         return false;
     }
 
+    /* =================================================
+       API BASE URL
+       ================================================= */
 
-    /* =====================================================
-       GET ADMIN PROFILE
-    ===================================================== */
+    const API_BASE_URL =
+        window.EPS_API?.baseUrl
+            ? window.EPS_API.baseUrl
+            : (
+                window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+            )
+                ? "http://127.0.0.1:8000"
+                : "http://10.60.227.210:8000";
 
-    let adminData = {};
+    console.log("API BASE URL:", API_BASE_URL);
+
+
+    /* =================================================
+       GET ELEMENTS
+       ================================================= */
+
+    const topName =
+        document.getElementById("topAdminName");
+
+    const topRole =
+        document.getElementById("topAdminRole");
+
+    const topAvatar =
+        document.getElementById("topAdminAvatar");
+
+    const sidebarName =
+        document.getElementById("sidebarAdminName");
+
+    const sidebarRole =
+        document.getElementById("sidebarAdminRole");
+
+    const sidebarAvatar =
+        document.getElementById("sidebarAdminAvatar");
+
+
+    /* =================================================
+       FIRST: LOAD SAVED ADMIN DATA
+       ================================================= */
+
+    let savedAdmin = {};
+
+    try {
+        savedAdmin =
+            JSON.parse(
+                localStorage.getItem("admin_user") || "{}"
+            );
+    } catch (error) {
+        console.error(
+            "Could not parse admin_user:",
+            error
+        );
+    }
+
+    console.log("Saved admin:", savedAdmin);
+
+
+    /* =================================================
+       TEMPORARY LOCAL DISPLAY
+       ================================================= */
+
+    let savedName =
+        savedAdmin.name ||
+        savedAdmin.full_name ||
+        savedAdmin.username ||
+        savedAdmin.email ||
+        "";
+
+    let savedRole =
+        savedAdmin.role ||
+        "ADMIN";
+
+
+    if (savedName) {
+
+        if (topName)
+            topName.textContent = savedName;
+
+        if (sidebarName)
+            sidebarName.textContent = savedName;
+    }
+
+    if (topRole)
+        topRole.textContent = savedRole;
+
+    if (sidebarRole)
+        sidebarRole.textContent = savedRole;
+
+
+    /* =================================================
+       LOAD PROFILE FROM BACKEND
+       ================================================= */
 
     try {
 
-        adminData = JSON.parse(
-            localStorage.getItem("admin_user") || "{}"
+        const response =
+            await fetch(
+                `${API_BASE_URL}/auth/profile`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        console.log(
+            "Profile response status:",
+            response.status
         );
+
+
+        const data =
+            await response.json()
+                .catch(() => ({}));
+
+
+        console.log(
+            "Profile API response:",
+            data
+        );
+
+
+        /* =================================================
+           SESSION EXPIRED
+           ================================================= */
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            console.error(
+                "Admin token is invalid or expired."
+            );
+
+            localStorage.removeItem(
+                "admin_access_token"
+            );
+
+            localStorage.removeItem(
+                "admin_user"
+            );
+
+            window.location.href =
+                "ad-login.html";
+
+            return false;
+        }
+
+
+        /* =================================================
+           OTHER API ERROR
+           ================================================= */
+
+        if (!response.ok) {
+
+            console.error(
+                "Profile API error:",
+                data
+            );
+
+            throw new Error(
+                data.detail ||
+                data.message ||
+                "Unable to load admin profile."
+            );
+        }
+
+
+        /* =================================================
+           GET NAME
+           Supports different backend field names
+           ================================================= */
+
+        const adminName =
+            data.name ||
+            data.full_name ||
+            data.fullName ||
+            data.username ||
+            data.user_name ||
+            data.email ||
+            savedName ||
+            "Admin";
+
+
+        const adminRole =
+            String(
+                data.role ||
+                savedRole ||
+                "ADMIN"
+            ).toUpperCase();
+
+
+        const adminEmail =
+            data.email ||
+            savedAdmin.email ||
+            "";
+
+
+        /* =================================================
+           SAVE VERIFIED ADMIN
+           ================================================= */
+
+        const adminData = {
+
+            id:
+                data.id ||
+                savedAdmin.id ||
+                null,
+
+            name:
+                adminName,
+
+            email:
+                adminEmail,
+
+            role:
+                adminRole
+        };
+
+
+        localStorage.setItem(
+            "admin_user",
+            JSON.stringify(adminData)
+        );
+
+
+        console.log(
+            "FINAL ADMIN DATA:",
+            adminData
+        );
+
+
+        /* =================================================
+           AVATAR
+           ================================================= */
+
+        const avatarLetter =
+            adminName
+                .trim()
+                .charAt(0)
+                .toUpperCase() || "A";
+
+
+        const savedPicture =
+            localStorage.getItem(
+                "adminProfilePicture"
+            ) || "";
+
+
+        /* =================================================
+           TOP PROFILE
+           ================================================= */
+
+        if (topName)
+            topName.textContent =
+                adminName;
+
+        if (topRole)
+            topRole.textContent =
+                adminRole;
+
+
+        if (topAvatar) {
+
+            if (savedPicture) {
+
+                topAvatar.textContent = "";
+
+                topAvatar.style.backgroundImage =
+                    `url("${savedPicture}")`;
+
+                topAvatar.style.backgroundSize =
+                    "cover";
+
+                topAvatar.style.backgroundPosition =
+                    "center";
+
+                topAvatar.style.backgroundRepeat =
+                    "no-repeat";
+
+            } else {
+
+                topAvatar.style.backgroundImage =
+                    "none";
+
+                topAvatar.textContent =
+                    avatarLetter;
+            }
+        }
+
+
+        /* =================================================
+           SIDEBAR PROFILE
+           ================================================= */
+
+        if (sidebarName)
+            sidebarName.textContent =
+                adminName;
+
+        if (sidebarRole)
+            sidebarRole.textContent =
+                adminRole;
+
+
+        if (sidebarAvatar) {
+
+            if (savedPicture) {
+
+                sidebarAvatar.textContent = "";
+
+                sidebarAvatar.style.backgroundImage =
+                    `url("${savedPicture}")`;
+
+                sidebarAvatar.style.backgroundSize =
+                    "cover";
+
+                sidebarAvatar.style.backgroundPosition =
+                    "center";
+
+                sidebarAvatar.style.backgroundRepeat =
+                    "no-repeat";
+
+            } else {
+
+                sidebarAvatar.style.backgroundImage =
+                    "none";
+
+                sidebarAvatar.textContent =
+                    avatarLetter;
+            }
+        }
+
+
+        console.log(
+            "Admin profile loaded successfully:",
+            adminName
+        );
+
+        return true;
+
 
     } catch (error) {
 
         console.error(
-            "Unable to read admin profile:",
+            "Failed to fetch admin profile:",
             error
         );
 
-        adminData = {};
-    }
+
+        /* =================================================
+           FALLBACK TO SAVED DATA
+           ================================================= */
+
+        const fallbackName =
+            savedAdmin.name ||
+            savedAdmin.full_name ||
+            savedAdmin.fullName ||
+            savedAdmin.username ||
+            savedAdmin.user_name ||
+            savedAdmin.email ||
+            "Admin";
 
 
-    /* =====================================================
-       ADMIN NAME / ROLE
-    ===================================================== */
-
-    const adminName =
-        adminData.name ||
-        adminData.email ||
-        "Admin";
-
-    const adminRole =
-        adminData.role ||
-        "ADMIN";
+        const fallbackRole =
+            savedAdmin.role ||
+            "ADMIN";
 
 
-    const avatarLetter =
-        adminName
-            .charAt(0)
-            .toUpperCase();
+        const avatarLetter =
+            fallbackName
+                .trim()
+                .charAt(0)
+                .toUpperCase() || "A";
 
 
-    /* =====================================================
-       PROFILE PICTURE
-    ===================================================== */
+        if (topName)
+            topName.textContent =
+                fallbackName;
 
-    const savedPicture =
-        localStorage.getItem(
-            "adminProfilePicture"
-        ) || "";
+        if (topRole)
+            topRole.textContent =
+                fallbackRole;
 
+        if (sidebarName)
+            sidebarName.textContent =
+                fallbackName;
 
-    /* =====================================================
-       TOP PROFILE
-    ===================================================== */
-
-    const topName =
-        document.getElementById(
-            "topAdminName"
-        );
-
-    const topRole =
-        document.getElementById(
-            "topAdminRole"
-        );
-
-    const topAvatar =
-        document.getElementById(
-            "topAdminAvatar"
-        );
+        if (sidebarRole)
+            sidebarRole.textContent =
+                fallbackRole;
 
 
-    if (topName) {
-
-        topName.textContent =
-            adminName;
-    }
-
-
-    if (topRole) {
-
-        topRole.textContent =
-            adminRole;
-    }
-
-
-    if (topAvatar) {
-
-        if (savedPicture) {
-
-            topAvatar.textContent =
-                "";
-
-            topAvatar.style.backgroundImage =
-                `url("${savedPicture}")`;
-
-            topAvatar.style.backgroundSize =
-                "cover";
-
-            topAvatar.style.backgroundPosition =
-                "center";
-
-            topAvatar.style.backgroundRepeat =
-                "no-repeat";
-
-        } else {
+        if (topAvatar) {
 
             topAvatar.style.backgroundImage =
                 "none";
@@ -2860,63 +3036,9 @@ quiz.status =
             topAvatar.textContent =
                 avatarLetter;
         }
-    }
 
 
-    /* =====================================================
-       SIDEBAR PROFILE
-    ===================================================== */
-
-    const sidebarName =
-        document.getElementById(
-            "sidebarAdminName"
-        );
-
-    const sidebarRole =
-        document.getElementById(
-            "sidebarAdminRole"
-        );
-
-    const sidebarAvatar =
-        document.getElementById(
-            "sidebarAdminAvatar"
-        );
-
-
-    if (sidebarName) {
-
-        sidebarName.textContent =
-            adminName;
-    }
-
-
-    if (sidebarRole) {
-
-        sidebarRole.textContent =
-            adminRole;
-    }
-
-
-    if (sidebarAvatar) {
-
-        if (savedPicture) {
-
-            sidebarAvatar.textContent =
-                "";
-
-            sidebarAvatar.style.backgroundImage =
-                `url("${savedPicture}")`;
-
-            sidebarAvatar.style.backgroundSize =
-                "cover";
-
-            sidebarAvatar.style.backgroundPosition =
-                "center";
-
-            sidebarAvatar.style.backgroundRepeat =
-                "no-repeat";
-
-        } else {
+        if (sidebarAvatar) {
 
             sidebarAvatar.style.backgroundImage =
                 "none";
@@ -2924,12 +3046,53 @@ quiz.status =
             sidebarAvatar.textContent =
                 avatarLetter;
         }
+
+
+        console.log(
+            "Using saved admin profile:",
+            fallbackName
+        );
+
+        return true;
     }
-
-
-    return true;
 }
 
+/* =========================================================
+   ADMIN LOGOUT
+   ========================================================= */
+
+const logoutBtn =
+    document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+
+    logoutBtn.addEventListener(
+        "click",
+        function () {
+
+            console.log("Admin logout clicked.");
+
+            /* Remove admin session */
+            localStorage.removeItem(
+                "admin_access_token"
+            );
+
+            /* Remove saved admin information */
+            localStorage.removeItem(
+                "admin_user"
+            );
+
+            /* Remove profile picture */
+            localStorage.removeItem(
+                "adminProfilePicture"
+            );
+
+            /* Redirect to admin login */
+            window.location.href =
+                "ad-login.html";
+        }
+    );
+}
 
     /* =========================================================
        INITIALIZE
