@@ -1,7 +1,10 @@
 /* Central backend configuration for the static EPS-TOPIK frontend. */
 (function () {
-  const baseUrl = window.API_BASE_URL || "http://127.0.0.1:8000";
-
+  const baseUrl =
+  window.API_BASE_URL ||
+  (window.location.hostname.endsWith("devtunnels.ms")
+    ? "https://r214c28p-8000.inc1.devtunnels.ms"
+    : "http://127.0.0.1:8000");
   async function request(path, options) {
     const response = await fetch(`${baseUrl}${path}`, {
       ...options,

@@ -1,5 +1,9 @@
 ﻿//const API_BASE_URL = "https://10.60.227.210:8000";
-const API_BASE_URL = window.EPS_API?.baseUrl || "http://127.0.0.1:8000";
+const API_BASE_URL =
+    window.API_BASE_URL ||
+    (window.location.hostname.endsWith("devtunnels.ms")
+        ? "https://r214c28p-8000.inc1.devtunnels.ms"
+        : "http://127.0.0.1:8000");
 const API_ENDPOINTS = {
 
   login:
@@ -2043,7 +2047,7 @@ async function loadDashboardProfile() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:8000/auth/profile",
+            `${API_BASE_URL}/auth/profile`,
             {
                 method: "GET",
 
