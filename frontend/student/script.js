@@ -4389,3 +4389,95 @@ if (confirmSubmitButton) {
 
     }
 );
+
+/* =========================================================
+   BEGIN TEST - LOGIN REQUIRED
+   ========================================================= */
+
+const beginTestBtn =
+  document.getElementById("beginTestBtn");
+
+const loginRequiredModal =
+  document.getElementById("loginRequiredModal");
+
+const closeLoginModal =
+  document.getElementById("closeLoginModal");
+
+const cancelLoginModal =
+  document.getElementById("cancelLoginModal");
+
+
+if (beginTestBtn) {
+
+  beginTestBtn.addEventListener(
+    "click",
+    function (event) {
+
+      event.preventDefault();
+
+      const accessToken =
+        localStorage.getItem("access_token");
+
+      if (!accessToken) {
+
+        loginRequiredModal.style.display = "flex";
+
+        return;
+      }
+
+      window.location.href =
+        "student/set.html";
+
+    }
+  );
+
+}
+
+
+/* ================= CLOSE POPUP ================= */
+
+function closeLoginRequiredModal() {
+
+  if (loginRequiredModal) {
+    loginRequiredModal.style.display = "none";
+  }
+
+}
+
+
+if (closeLoginModal) {
+
+  closeLoginModal.addEventListener(
+    "click",
+    closeLoginRequiredModal
+  );
+
+}
+
+
+if (cancelLoginModal) {
+
+  cancelLoginModal.addEventListener(
+    "click",
+    closeLoginRequiredModal
+  );
+
+}
+
+
+/* ================= CLICK OUTSIDE ================= */
+
+if (loginRequiredModal) {
+
+  loginRequiredModal.addEventListener(
+    "click",
+    function (event) {
+
+      if (event.target === loginRequiredModal) {
+        closeLoginRequiredModal();
+      }
+
+    }
+  );
+
+}

@@ -385,14 +385,13 @@
       </div>
 
 
-      <a
-        class="primary-btn"
-        href="student/set.html"
-      >
-
-        Begin Test →
-
-      </a>
+     <a
+  class="primary-btn"
+  href="#"
+  id="beginTestBtn"
+>
+  Begin Test →
+</a>
 
 
     </section>
@@ -419,7 +418,56 @@
 
   </footer>
 
+<!-- ================= LOGIN REQUIRED POPUP ================= -->
 
+<div
+  id="loginRequiredModal"
+  class="login-modal"
+  style="display: none;"
+>
+  <div class="login-modal-box">
+
+    <button
+      type="button"
+      class="login-modal-close"
+      id="closeLoginModal"
+    >
+      ×
+    </button>
+
+    <div class="login-modal-icon">
+      🔒
+    </div>
+
+    <h3>
+      Login Required
+    </h3>
+
+    <p>
+      Please login to your student account before starting the test.
+    </p>
+
+    <div class="login-modal-actions">
+
+      <button
+        type="button"
+        class="login-modal-cancel"
+        id="cancelLoginModal"
+      >
+        Cancel
+      </button>
+
+      <a
+        href="student/login.html"
+        class="login-modal-login"
+      >
+        Student Login
+      </a>
+
+    </div>
+
+  </div>
+</div>
 
   <!-- ================= JAVASCRIPT ================= -->
 
